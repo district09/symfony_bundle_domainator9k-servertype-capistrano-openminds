@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoFileFieldType:
+        tags:
+            - { name: field_type}
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provider\DataTypeProvider:
+        tags:
+            - { name: data_type_provider }
