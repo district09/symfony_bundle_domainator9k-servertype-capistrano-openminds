@@ -90,7 +90,10 @@ class CapistranoFileFieldType extends AbstractFieldType
 
             if(!is_null($ids)){
                 foreach ($ids as $id){
-                    $data[] = clone $capistranoFileRepository->find($id);
+                    $originalCapistranoFile = $capistranoFileRepository->find($id);
+                    $newCapistranoFile = clone $originalCapistranoFile;
+                    $newCapistranoFile->setOriginalCapistranoFile($originalCapistranoFile);
+                    $data[] = $newCapistranoFile;
                 }
             }
         }

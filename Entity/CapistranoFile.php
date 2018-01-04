@@ -54,6 +54,13 @@ class CapistranoFile
     protected $content;
 
     /**
+     * @var CapistranoFile
+     *
+     * @ORM\ManyToOne(targetEntity="CapistranoFile")
+     */
+    protected $originalCapistranoFile;
+
+    /**
      * @return string
      */
     public function getName()
@@ -135,5 +142,21 @@ class CapistranoFile
 
     public function __clone() {
         $this->id = null;
+    }
+
+    /**
+     * @return CapistranoFile
+     */
+    public function getOriginalCapistranoFile()
+    {
+        return $this->originalCapistranoFile;
+    }
+
+    /**
+     * @param CapistranoFile $originalCapistranoFile
+     */
+    public function setOriginalCapistranoFile(CapistranoFile $originalCapistranoFile)
+    {
+        $this->originalCapistranoFile = $originalCapistranoFile;
     }
 }
