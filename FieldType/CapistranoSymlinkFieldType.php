@@ -7,18 +7,18 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Field
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationType;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationTypeEnvironment;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFileFormType;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoSymlinkFormType;
 use DigipolisGent\SettingBundle\Entity\SettingDataValue;
 use DigipolisGent\SettingBundle\FieldType\AbstractFieldType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 /**
- * Class CapistranoFileFieldType
+ * Class CapistranoSymlinkFieldType
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType
  */
-class CapistranoFileFieldType extends AbstractFieldType
+class CapistranoSymlinkFieldType extends AbstractFieldType
 {
 
     private $entityManager;
@@ -47,23 +47,23 @@ class CapistranoFileFieldType extends AbstractFieldType
     public function getOptions($value): array
     {
         $options = [];
-        $options['entry_type'] = CapistranoFileFormType::class;
+        $options['entry_type'] = CapistranoSymlinkFormType::class;
         $options['allow_add'] = true;
         $options['allow_delete'] = true;
         $options['by_reference'] = false;
         $options['prototype'] = true;
-        $options['prototype_data'] = new CapistranoFile();
+        $options['prototype_data'] = new CapistranoSymlink();
 
         $ids = json_decode($value, true);
 
         $originEntity = $this->getOriginEntity();
-        $capistranoFileRepository = $this->entityManager->getRepository(CapistranoFile::class);
+        $capistranoSymlinkRepository = $this->entityManager->getRepository(CapistranoSymlink::class);
 
         $data = [];
 
         if (!is_null($ids)) {
             foreach ($ids as $id) {
-                $data[] = $capistranoFileRepository->find($id);
+                $data[] = $capistranoSymlinkRepository->find($id);
             }
         }
 
@@ -90,10 +90,9 @@ class CapistranoFileFieldType extends AbstractFieldType
 
             if (!is_null($ids)) {
                 foreach ($ids as $id) {
-                    $originalCapistranoFile = $capistranoFileRepository->find($id);
-                    $newCapistranoFile = clone $originalCapistranoFile;
-                    $newCapistranoFile->setOriginalCapistranoFile($originalCapistranoFile);
-                    $data[] = $newCapistranoFile;
+                    $originalCapistranoSymlink = $capistranoSymlinkRepository->find($id);
+                    $newCapistranoSymlink = clone $originalCapistranoSymlink;
+                    $data[] = $newCapistranoSymlink;
                 }
             }
         }
@@ -108,7 +107,7 @@ class CapistranoFileFieldType extends AbstractFieldType
      */
     public static function getName(): string
     {
-        return 'capistrano_file';
+        return 'capistrano_symlink';
     }
 
     /**
@@ -117,23 +116,19 @@ class CapistranoFileFieldType extends AbstractFieldType
      */
     public function encodeValue($value): string
     {
-        $capistranoFileIds = [];
+        $capistranoSymlinkIds = [];
 
-        foreach ($value as $capistranoFile) {
-            $this->entityManager->persist($capistranoFile);
-            $capistranoFileIds[] = $capistranoFile->getId();
+        foreach ($value as $capistranoSymlink) {
+            $this->entityManager->persist($capistranoSymlink);
+            $capistranoSymlinkIds[] = $capistranoSymlink->getId();
         }
 
-        return json_encode($capistranoFileIds);
+        return json_encode($capistranoSymlinkIds);
     }
 
-    /**
-     * @param $value
-     * @return array
-     */
     public function decodeValue($value)
     {
-        $capistranoFileRepository = $this->entityManager->getRepository(CapistranoFile::class);
+        $capistranoSymlinkRepository = $this->entityManager->getRepository(CapistranoSymlink::class);
 
         $ids = [];
 
@@ -141,13 +136,13 @@ class CapistranoFileFieldType extends AbstractFieldType
             return [];
         }
 
-        $capistranoFiles = [];
+        $capistranoSymlinks = [];
         $ids = json_decode($value, true);
 
         foreach ($ids as $id) {
-            $capistranoFiles[] = $capistranoFileRepository->find($id);
+            $capistranoSymlinks[] = $capistranoSymlinkRepository->find($id);
         }
 
-        return $capistranoFiles;
+        return $capistranoSymlinks;
     }
 }

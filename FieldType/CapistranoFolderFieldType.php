@@ -8,17 +8,19 @@ use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationType;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationTypeEnvironment;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFileFormType;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFolderFormType;
 use DigipolisGent\SettingBundle\Entity\SettingDataValue;
 use DigipolisGent\SettingBundle\FieldType\AbstractFieldType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 /**
- * Class CapistranoFileFieldType
+ * Class CapistranoFolderFieldType
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType
  */
-class CapistranoFileFieldType extends AbstractFieldType
+class CapistranoFolderFieldType extends AbstractFieldType
 {
 
     private $entityManager;
@@ -47,23 +49,23 @@ class CapistranoFileFieldType extends AbstractFieldType
     public function getOptions($value): array
     {
         $options = [];
-        $options['entry_type'] = CapistranoFileFormType::class;
+        $options['entry_type'] = CapistranoFolderFormType::class;
         $options['allow_add'] = true;
         $options['allow_delete'] = true;
         $options['by_reference'] = false;
         $options['prototype'] = true;
-        $options['prototype_data'] = new CapistranoFile();
+        $options['prototype_data'] = new CapistranoFolder();
 
         $ids = json_decode($value, true);
 
         $originEntity = $this->getOriginEntity();
-        $capistranoFileRepository = $this->entityManager->getRepository(CapistranoFile::class);
+        $capistranoFolderRepository = $this->entityManager->getRepository(CapistranoFolder::class);
 
         $data = [];
 
         if (!is_null($ids)) {
             foreach ($ids as $id) {
-                $data[] = $capistranoFileRepository->find($id);
+                $data[] = $capistranoFolderRepository->find($id);
             }
         }
 
@@ -90,10 +92,9 @@ class CapistranoFileFieldType extends AbstractFieldType
 
             if (!is_null($ids)) {
                 foreach ($ids as $id) {
-                    $originalCapistranoFile = $capistranoFileRepository->find($id);
-                    $newCapistranoFile = clone $originalCapistranoFile;
-                    $newCapistranoFile->setOriginalCapistranoFile($originalCapistranoFile);
-                    $data[] = $newCapistranoFile;
+                    $originalCapistranoFolder = $capistranoFolderRepository->find($id);
+                    $newCapistranoFolder = clone $originalCapistranoFolder;
+                    $data[] = $newCapistranoFolder;
                 }
             }
         }
@@ -108,7 +109,7 @@ class CapistranoFileFieldType extends AbstractFieldType
      */
     public static function getName(): string
     {
-        return 'capistrano_file';
+        return 'capistrano_folder';
     }
 
     /**
@@ -117,14 +118,14 @@ class CapistranoFileFieldType extends AbstractFieldType
      */
     public function encodeValue($value): string
     {
-        $capistranoFileIds = [];
+        $capistranoFolderIds = [];
 
-        foreach ($value as $capistranoFile) {
-            $this->entityManager->persist($capistranoFile);
-            $capistranoFileIds[] = $capistranoFile->getId();
+        foreach ($value as $capistranoFolder) {
+            $this->entityManager->persist($capistranoFolder);
+            $capistranoFolderIds[] = $capistranoFolder->getId();
         }
 
-        return json_encode($capistranoFileIds);
+        return json_encode($capistranoFolderIds);
     }
 
     /**
@@ -133,7 +134,7 @@ class CapistranoFileFieldType extends AbstractFieldType
      */
     public function decodeValue($value)
     {
-        $capistranoFileRepository = $this->entityManager->getRepository(CapistranoFile::class);
+        $capistranoFolderRepository = $this->entityManager->getRepository(CapistranoFolder::class);
 
         $ids = [];
 
@@ -141,13 +142,13 @@ class CapistranoFileFieldType extends AbstractFieldType
             return [];
         }
 
-        $capistranoFiles = [];
+        $capistranoFolders = [];
         $ids = json_decode($value, true);
 
         foreach ($ids as $id) {
-            $capistranoFiles[] = $capistranoFileRepository->find($id);
+            $capistranoFolders[] = $capistranoFolderRepository->find($id);
         }
 
-        return $capistranoFiles;
+        return $capistranoFolders;
     }
 }
