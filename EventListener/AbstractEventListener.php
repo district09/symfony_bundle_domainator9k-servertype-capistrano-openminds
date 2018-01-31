@@ -3,8 +3,61 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
 
+use DigipolisGent\Domainator9k\CoreBundle\Entity\Server;
+use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
+use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\LoginFailedException;
+use DigipolisGent\SettingBundle\Service\DataValueService;
+use Doctrine\ORM\EntityManagerInterface;
+use phpseclib\Crypt\RSA;
+use phpseclib\Net\SSH2;
 
-class AbstractEventListener
+abstract class AbstractEventListener
 {
 
+    protected $dataValueService;
+    protected $templateService;
+    protected $taskLoggerService;
+    protected $entityManager;
+
+    /**
+     * BuildEventListener constructor.
+     * @param DataValueService $dataValueService
+     * @param TemplateService $templateService
+     */
+    public function __construct(
+        DataValueService $dataValueService,
+        TemplateService $templateService,
+        TaskLoggerService $taskLoggerService,
+        EntityManagerInterface $entityManager
+    ) {
+        $this->dataValueService = $dataValueService;
+        $this->templateService = $templateService;
+        $this->taskLoggerService = $taskLoggerService;
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @param Server $server
+     * @return SSH2
+     * @throws LoginFailedException
+     */
+    public function getSshCommand(Server $server): SSH2
+    {
+        $user = $this->dataValueService->getValue($server, 'capistrano_user');
+        $passphrase = $this->dataValueService->getValue($server, 'capistrano_private_key_passphrase');
+        $keyLocation = $this->dataValueService->getValue($server, 'capistrano_private_key_location');
+
+        $ssh = new SSH2($server->getHost(), $server->getPort());
+
+        $key = new RSA();
+        $key->setPassword($passphrase);
+        $key->loadKey(file_get_contents($keyLocation));
+
+        if (!$ssh->login($user, $key)) {
+            throw new LoginFailedException();
+        }
+
+        return $ssh;
+    }
 }

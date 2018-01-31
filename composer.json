@@ -8,10 +8,14 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=7.1",
-    "phpseclib/phpseclib": "^2.0"
+    "symfony/symfony": ">=3.4",
+    "doctrine/orm": "^2.5",
+    "digipolisgent/domainator9k-core-bundle": "dev-develop",
+    "guzzlehttp/guzzle": "^6.3"
   },
   "require-dev": {
-    "symfony/symfony": ">=3.4"
+    "phpunit/phpunit": "^6.5",
+    "squizlabs/php_codesniffer": "^3.2"
   },
   "autoload": {
     "psr-4": {

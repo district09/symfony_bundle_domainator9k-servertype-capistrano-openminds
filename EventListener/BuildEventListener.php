@@ -3,48 +3,17 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
 
-
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Server;
 use DigipolisGent\Domainator9k\CoreBundle\Event\BuildEvent;
-use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
-use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\LoginFailedException;
-use DigipolisGent\SettingBundle\Service\DataValueService;
-use Doctrine\ORM\EntityManagerInterface;
-use phpseclib\Crypt\RSA;
 use phpseclib\Net\SSH2;
 
 /**
  * Class BuildEventListener
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener
  */
-class BuildEventListener
+class BuildEventListener extends AbstractEventListener
 {
-
-    private $dataValueService;
-    private $templateService;
-    private $taskLoggerService;
-    private $entityManager;
-
-    /**
-     * BuildEventListener constructor.
-     * @param DataValueService $dataValueService
-     * @param TemplateService $templateService
-     * @param TaskLoggerService $taskLoggerService
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct(
-        DataValueService $dataValueService,
-        TemplateService $templateService,
-        TaskLoggerService $taskLoggerService,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->dataValueService = $dataValueService;
-        $this->templateService = $templateService;
-        $this->taskLoggerService = $taskLoggerService;
-        $this->entityManager = $entityManager;
-    }
 
     /**
      * @param BuildEvent $event
@@ -81,34 +50,10 @@ class BuildEventListener
     }
 
     /**
-     * @param Server $server
-     * @return SSH2
-     * @throws LoginFailedException
-     */
-    private function getSshCommand(Server $server): SSH2
-    {
-        $user = $this->dataValueService->getValue($server, 'capistrano_user');
-        $passphrase = $this->dataValueService->getValue($server, 'capistrano_private_key_passphrase');
-        $keyLocation = $this->dataValueService->getValue($server, 'capistrano_private_key_location');
-
-        $ssh = new SSH2($server->getHost(), $server->getPort());
-
-        $key = new RSA();
-        $key->setPassword($passphrase);
-        $key->loadKey(file_get_contents($keyLocation));
-
-        if (!$ssh->login($user, $key)) {
-            throw new LoginFailedException();
-        }
-
-        return $ssh;
-    }
-
-    /**
      * @param SSH2 $ssh
      * @param ApplicationEnvironment $applicationEnvironment
      */
-    private function createFolders(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    public function createFolders(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         $templateEntities = [
             'application_environment' => $applicationEnvironment,
@@ -131,7 +76,7 @@ class BuildEventListener
      * @param SSH2 $ssh
      * @param ApplicationEnvironment $applicationEnvironment
      */
-    private function createSymlinks(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    public function createSymlinks(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         $templateEntities = [
             'application_environment' => $applicationEnvironment,
@@ -151,7 +96,7 @@ class BuildEventListener
                 $templateEntities
             );
 
-            $ssh->exec('ln -sfn  ' . $destination . ' ' . $source);
+            $ssh->exec('ln -sfn ' . $destination . ' ' . $source);
         }
     }
 
@@ -159,7 +104,7 @@ class BuildEventListener
      * @param SSH2 $ssh
      * @param ApplicationEnvironment $applicationEnvironment
      */
-    private function createFiles(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    public function createFiles(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         $templateEntities = [
             'application_environment' => $applicationEnvironment,

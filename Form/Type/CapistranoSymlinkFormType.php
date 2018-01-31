@@ -3,7 +3,6 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type;
 
-
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,6 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CapistranoSymlinkFormType extends AbstractType
 {
+
     /**
      * @param FormBuilderInterface $builder
      * @param array $options

@@ -3,38 +3,54 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\FieldType;
 
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoSymlinkFieldType;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoFolderFieldType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class CapistranoSymlinkFieldTypeTest extends AbstractFieldTypeTest
+class CapistranoFolderFieldTypeTest extends AbstractFieldTypeTest
 {
 
     public function testGetName()
     {
-        $this->assertEquals('capistrano_symlink', CapistranoSymlinkFieldType::getName());
+        $this->assertEquals('capistrano_folder', CapistranoFolderFieldType::getName());
     }
 
     public function testGetFormType()
     {
         $entityManager = $this->getEntityManagerMock();
-        $fieldType = new CapistranoSymlinkFieldType($entityManager);
+        $fieldType = new CapistranoFolderFieldType($entityManager);
         $this->assertEquals(CollectionType::class, $fieldType->getFormType());
     }
 
     public function testEncodeValue()
     {
         $this->generalTestEncodeValue(
-            CapistranoSymlinkFieldType::class,
-            CapistranoSymlink::class
+            CapistranoFolderFieldType::class,
+            CapistranoFolder::class
         );
     }
 
     public function testDecodeValue()
     {
         $this->generalTestDecodeValue(
-            CapistranoSymlinkFieldType::class,
-            CapistranoSymlink::class
+            CapistranoFolderFieldType::class,
+            CapistranoFolder::class
+        );
+    }
+
+    public function testGetOptionsWithApplicationEnvironment()
+    {
+        $this->generalTestGetOptionsWithApplicationEnvironment(
+            CapistranoFolderFieldType::class,
+            CapistranoFolder::class
+        );
+    }
+
+    public function testGetOptions()
+    {
+        $this->generalTestGetOptions(
+            CapistranoFolderFieldType::class,
+            CapistranoFolder::class
         );
     }
 }

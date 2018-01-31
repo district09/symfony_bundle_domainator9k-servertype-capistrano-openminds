@@ -4,9 +4,11 @@
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Form\Type;
 
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFileFormType;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFolderFormType;
 
-class CapistranoFileFormTypeTest extends AbstractFormTypeTest
+class CapistranoFolderFormTypeTest extends AbstractFormTypeTest
 {
 
     public function testBuildForm()
@@ -15,10 +17,7 @@ class CapistranoFileFormTypeTest extends AbstractFormTypeTest
 
         $childs = [
             'name',
-            'filename',
-            'extension',
             'location',
-            'content',
         ];
 
         $index = 0;
@@ -32,7 +31,7 @@ class CapistranoFileFormTypeTest extends AbstractFormTypeTest
             $index++;
         }
 
-        $formType = new CapistranoFileFormType();
+        $formType = new CapistranoFolderFormType();
         $formType->buildForm($formBuilder, []);
     }
 
@@ -42,9 +41,9 @@ class CapistranoFileFormTypeTest extends AbstractFormTypeTest
         $resolver
             ->expects($this->at(0))
             ->method('setDefaults')
-            ->with(['data_class' => CapistranoFile::class]);
+            ->with(['data_class' => CapistranoFolder::class]);
 
-        $formType = new CapistranoFileFormType();
+        $formType = new CapistranoFolderFormType();
         $formType->configureOptions($resolver);
     }
 }

@@ -3,16 +3,16 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests;
 
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
 use PHPUnit\Framework\TestCase;
 
-class CapistranoFolderTest extends TestCase
+class CapistranoSymlinkTest extends TestCase
 {
 
     public function testGettersAndSetters()
     {
-        $folder = new CapistranoFolder();
-        $folder->setName('name');
-        $this->assertEquals('name', $folder->getName());
+        $symlink = new CapistranoSymlink();
+        $symlink->setName('name');
+        $this->assertEquals('name', $symlink->getName());
     }
 }
