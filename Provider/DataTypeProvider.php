@@ -3,7 +3,6 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provider;
 
-
 use DigipolisGent\SettingBundle\Provider\DataTypeProviderInterface;
 
 /**

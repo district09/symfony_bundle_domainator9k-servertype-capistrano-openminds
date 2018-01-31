@@ -3,7 +3,6 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity;
 
-
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Traits\IdentifiableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -140,7 +139,8 @@ class CapistranoFile
         $this->content = $content;
     }
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->id = null;
     }
 

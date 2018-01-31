@@ -19,4 +19,3 @@ services:
     DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\DestroyEventListener:
         tags:
             - { name: kernel.event_listener, event: domainator.destroy, method: onDestroy, priority: 90 }
-    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Service\CapistranoService:
