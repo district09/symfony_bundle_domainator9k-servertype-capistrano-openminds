@@ -3,7 +3,7 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
 
-use DigipolisGent\Domainator9k\CoreBundle\Entity\Server;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\LoginFailedException;
@@ -42,7 +42,7 @@ abstract class AbstractEventListener
      * @return SSH2
      * @throws LoginFailedException
      */
-    public function getSshCommand(Server $server): SSH2
+    public function getSshCommand(VirtualServer $server): SSH2
     {
         $user = $this->dataValueService->getValue($server, 'capistrano_user');
         $passphrase = $this->dataValueService->getValue($server, 'capistrano_private_key_passphrase');

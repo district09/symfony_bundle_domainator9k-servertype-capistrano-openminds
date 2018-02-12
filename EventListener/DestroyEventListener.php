@@ -4,14 +4,8 @@
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
-use DigipolisGent\Domainator9k\CoreBundle\Entity\Server;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Event\DestroyEvent;
-use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
-use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\LoginFailedException;
-use DigipolisGent\SettingBundle\Service\DataValueService;
-use Doctrine\ORM\EntityManagerInterface;
-use phpseclib\Crypt\RSA;
 use phpseclib\Net\SSH2;
 
 /**
@@ -30,7 +24,7 @@ class DestroyEventListener extends AbstractEventListener
         $applicationEnvironment = $event->getTask()->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
 
-        $servers = $this->entityManager->getRepository(Server::class)->findAll();
+        $servers = $this->entityManager->getRepository(VirtualServer::class)->findAll();
 
         foreach ($servers as $server) {
             $ssh = $this->getSshCommand($server);

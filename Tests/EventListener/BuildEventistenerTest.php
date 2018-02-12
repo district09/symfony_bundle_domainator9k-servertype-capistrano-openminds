@@ -5,21 +5,15 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Environment;
-use DigipolisGent\Domainator9k\CoreBundle\Entity\Server;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Event\BuildEvent;
-use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
-use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\BuildEventListener;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Fixtures\FooApplication;
-use DigipolisGent\SettingBundle\Service\DataValueService;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use phpseclib\Net\SSH2;
 
 class BuildEventistenerTest extends AbstractEventistenerTest
 {
@@ -39,10 +33,10 @@ class BuildEventistenerTest extends AbstractEventistenerTest
         $applicationEnvironment->setApplication($application);
 
         $servers = new ArrayCollection();
-        $server = new Server();
+        $server = new VirtualServer();
         $server->setEnvironment($prodEnvironment);
         $servers->add($server);
-        $server = new Server();
+        $server = new VirtualServer();
         $server->setEnvironment($uatEnvironment);
         $servers->add($server);
 
@@ -68,7 +62,7 @@ class BuildEventistenerTest extends AbstractEventistenerTest
         $entityManager
             ->expects($this->at(0))
             ->method('getRepository')
-            ->with($this->equalTo(Server::class))
+            ->with($this->equalTo(VirtualServer::class))
             ->willReturn($serverRepository);
 
         $taskLoggerService
