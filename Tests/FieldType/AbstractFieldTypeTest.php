@@ -164,7 +164,7 @@ abstract class AbstractFieldTypeTest extends TestCase
         $applicationEnvironment->setApplication($application);
 
         $applicationType = new ApplicationType();
-        $applicationType->setType('foo');
+        $applicationType->setName('foo');
 
         $applicationTypeEnvironment = new ApplicationTypeEnvironment();
         $applicationTypeEnvironment->setApplicationType($applicationType);

@@ -27,9 +27,14 @@ class DestroyEventListener extends AbstractEventListener
         $servers = $this->entityManager->getRepository(VirtualServer::class)->findAll();
 
         foreach ($servers as $server) {
-            $ssh = $this->getSshCommand($server);
-
             if ($server->getEnvironment() != $environment) {
+                continue;
+            }
+
+            try {
+                $ssh = $this->getSshCommand($server);
+            } catch (\Exception $exception) {
+                $this->taskLoggerService->addLine($exception->getMessage());
                 continue;
             }
 

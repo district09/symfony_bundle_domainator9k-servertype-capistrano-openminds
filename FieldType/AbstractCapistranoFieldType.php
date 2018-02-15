@@ -100,7 +100,7 @@ abstract class AbstractCapistranoFieldType extends AbstractFieldType
 
         if ($originEntity instanceof ApplicationEnvironment && is_null($originEntity->getId())) {
             $criteria = [
-                'type' => $originEntity->getApplication()->getType()
+                'type' => $originEntity->getApplication()->getApplicationType()
             ];
 
             $applicationType = $atRepository->findOneBy($criteria);
