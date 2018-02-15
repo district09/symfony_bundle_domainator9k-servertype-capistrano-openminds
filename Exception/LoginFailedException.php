@@ -1,7 +1,7 @@
 <?php
 
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Exception;
 
 /**
  * Class LoginFailedException

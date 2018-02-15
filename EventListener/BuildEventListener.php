@@ -38,7 +38,8 @@ class BuildEventListener extends AbstractEventListener
             );
 
             try {
-                $ssh = $this->getSshCommand($server);
+                $user = $this->dataValueService->getValue($applicationEnvironment, 'sock_ssh_user');
+                $ssh = $this->getSshCommand($server, $user);
             } catch (\Exception $exception) {
                 $this->taskLoggerService->addLine($exception->getMessage());
                 continue;

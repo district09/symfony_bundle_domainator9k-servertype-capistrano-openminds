@@ -47,7 +47,7 @@ class BuildEventistenerTest extends AbstractEventistenerTest
 
         $event = new BuildEvent($task);
 
-        $dataValueService = $this->getDataValueServiceMock([]);
+        $dataValueService = $this->getDataValueServiceMock(['user']);
         $templateService = $this->getTemplateServiceMock();
         $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();

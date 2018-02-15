@@ -6,7 +6,7 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Event
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\LoginFailedException;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Exception\LoginFailedException;
 use DigipolisGent\SettingBundle\Service\DataValueService;
 use Doctrine\ORM\EntityManagerInterface;
 use phpseclib\Crypt\RSA;
@@ -42,9 +42,8 @@ abstract class AbstractEventListener
      * @return SSH2
      * @throws LoginFailedException
      */
-    public function getSshCommand(VirtualServer $server): SSH2
+    public function getSshCommand(VirtualServer $server, string $user): SSH2
     {
-        $user = $this->dataValueService->getValue($server, 'capistrano_user');
         $passphrase = $this->dataValueService->getValue($server, 'capistrano_private_key_passphrase');
         $keyLocation = $this->dataValueService->getValue($server, 'capistrano_private_key_location');
 
@@ -55,7 +54,7 @@ abstract class AbstractEventListener
         $key->loadKey(file_get_contents($keyLocation));
 
         if (!$ssh->login($user, $key)) {
-            throw new LoginFailedException();
+            throw new LoginFailedException('Login failed.');
         }
 
         return $ssh;

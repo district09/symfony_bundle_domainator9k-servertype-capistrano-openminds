@@ -46,7 +46,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
 
         $event = new DestroyEvent($task);
 
-        $dataValueService = $this->getDataValueServiceMock([]);
+        $dataValueService = $this->getDataValueServiceMock(['username']);
         $templateService = $this->getTemplateServiceMock();
         $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
