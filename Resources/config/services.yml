@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        autowire: true
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoFileFieldType:
+        tags:
+            - { name: field_type}
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoFolderFieldType:
+        tags:
+            - { name: field_type}
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoSymlinkFieldType:
+        tags:
+            - { name: field_type}
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provider\DataTypeProvider:
+        tags:
+            - { name: data_type_provider }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\BuildEventListener:
+        tags:
+            - { name: kernel.event_listener, event: domainator.build, method: onBuild, priority: 30 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\DestroyEventListener:
+        tags:
+            - { name: kernel.event_listener, event: domainator.destroy, method: onDestroy, priority: 90 }
