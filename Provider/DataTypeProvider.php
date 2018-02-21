@@ -29,6 +29,13 @@ class DataTypeProvider implements DataTypeProviderInterface
                 'entity_types' => ['server'],
             ],
             [
+                'key' => 'manage_capistrano',
+                'label' => 'Manage capistrano',
+                'required' => false,
+                'field_type' => 'boolean',
+                'entity_types' => ['server'],
+            ],
+            [
                 'key' => 'capistrano_file',
                 'label' => 'Capistrano file',
                 'required' => true,
