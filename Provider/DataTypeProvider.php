@@ -24,7 +24,7 @@ class DataTypeProvider implements DataTypeProviderInterface
             [
                 'key' => 'capistrano_private_key_passphrase',
                 'label' => 'Capistrano private key passphrase',
-                'required' => true,
+                'required' => false,
                 'field_type' => 'string',
                 'entity_types' => ['server'],
             ],
