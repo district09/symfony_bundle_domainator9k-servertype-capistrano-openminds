@@ -18,7 +18,7 @@ class DataTypeProvider implements DataTypeProviderInterface
                 'key' => 'capistrano_private_key_location',
                 'label' => 'Capistrano private key location',
                 'required' => true,
-                'field_type' => 'string',
+                'field_type' => 'file_location',
                 'entity_types' => ['server'],
             ],
             [
