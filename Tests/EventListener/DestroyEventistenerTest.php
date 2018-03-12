@@ -73,6 +73,9 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
             },
+            'removeFiles' => function () {
+                return null;
+            },
             'removeSymlinks' => function () {
                 return null;
             },

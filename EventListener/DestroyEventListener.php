@@ -46,11 +46,39 @@ class DestroyEventListener extends AbstractEventListener
                 )
             );
 
+            $this->taskLoggerService->addLine('Removing files');
+            $this->removeFiles($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine('Removing symlinks');
             $this->removeSymlinks($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine('Removing directories');
             $this->removeFolders($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine($ssh->getLog());
+        }
+    }
+
+    /**
+     * @param SSH2 $ssh
+     * @param ApplicationEnvironment $applicationEnvironment
+     */
+    public function removeFiles(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    {
+        $templateEntities = [
+            'application_environment' => $applicationEnvironment,
+            'application' => $applicationEnvironment->getApplication(),
+        ];
+
+
+        $capistranoFiles = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_file');
+        foreach ($capistranoFiles as $capistranoFile) {
+            $path = $capistranoFile->getLocation();
+            $path .= '/' . $capistranoFile->getFilename();
+            $path .= '.' . $capistranoFile->getExtension();
+
+            $path = escapeshellarg(
+                $this->templateService->replaceKeys($path, $templateEntities)
+            );
+
+            $ssh->exec('rm ' . $path);
         }
     }
 
