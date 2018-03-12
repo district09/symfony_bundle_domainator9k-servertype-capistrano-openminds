@@ -50,7 +50,9 @@ abstract class AbstractEventListener
         $ssh = new SSH2($server->getHost(), $server->getPort());
 
         $key = new RSA();
-        $key->setPassword($passphrase);
+        if (!empty($passphrase)) {
+            $key->setPassword($passphrase);
+        }
         $key->loadKey(file_get_contents($keyLocation));
 
         if (!$ssh->login($user, $key)) {
