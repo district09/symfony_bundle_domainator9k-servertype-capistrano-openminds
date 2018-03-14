@@ -20,9 +20,6 @@ class BuildEventListener extends AbstractEventListener
      */
     public function onBuild(BuildEvent $event)
     {
-        if (!defined('NET_SSH2_LOGGING')) {
-            define('NET_SSH2_LOGGING', SSH2::LOG_COMPLEX);
-        }
         $applicationEnvironment = $event->getTask()->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
 
