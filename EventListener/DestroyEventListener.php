@@ -73,7 +73,8 @@ class DestroyEventListener extends AbstractEventListener
                 $templateEntities
             );
 
-            $ssh->exec('rm ' . $source);
+            $command = 'rm ' . $source;
+            $this->executeSshCommand($command);
         }
     }
 
@@ -96,7 +97,8 @@ class DestroyEventListener extends AbstractEventListener
         }
 
         foreach ($locations as $location) {
-            $ssh->exec('rm -rf ' . $location);
+            $command = 'rm -rf ' . $location;
+            $this->executeSshCommand($command);
         }
     }
 }
