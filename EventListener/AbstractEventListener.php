@@ -72,13 +72,16 @@ abstract class AbstractEventListener
     protected function executeSshCommand(SSH2 $ssh, $command)
     {
         $this->taskLoggerService->addLine(sprintf('Executing %s.', $command));
-        $result = $ssh->exec($command);
-        if ($result) {
-            $this->taskLoggerService->addLine('SSH output:');
-            $this->taskLoggerService->addLine($result);
-        }
+        $output = '';
+        $result = $ssh->exec($command, function ($tmp) use ($output) {
+            $output .= $tmp;
+        });
         if (!$result) {
             $this->taskLoggerService->addLine(sprintf('Command %s failed.', $command));
+        }
+        if ($output) {
+            $this->taskLoggerService->addLine('SSH output:');
+            $this->taskLoggerService->addLine($output);
         }
         return $result;
     }
