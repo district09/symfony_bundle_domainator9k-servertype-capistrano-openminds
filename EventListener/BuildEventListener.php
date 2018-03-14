@@ -81,7 +81,8 @@ class BuildEventListener extends AbstractEventListener
         }
 
         foreach ($locations as $location) {
-            $ssh->exec('mkdir -p ' . $location);
+            $command = 'mkdir -p ' . $location;
+            $this->executeSshCommand($ssh, $command);
         }
     }
 
@@ -109,7 +110,8 @@ class BuildEventListener extends AbstractEventListener
                 $templateEntities
             );
 
-            $ssh->exec('ln -sfn ' . $destination . ' ' . $source);
+            $command = 'ln -sfn ' . $destination . ' ' . $source;
+            $this->executeSshCommand($ssh, $command);
         }
     }
 
@@ -138,7 +140,8 @@ class BuildEventListener extends AbstractEventListener
                 $this->templateService->replaceKeys($capistranoFile->getContent(), $templateEntities)
             );
 
-            $ssh->exec('echo ' . $content . ' > ' . $path);
+            $command = 'echo ' . $content . ' > ' . $path;
+            $this->executeSshCommand($ssh, $command);
         }
     }
 
