@@ -20,6 +20,9 @@ class BuildEventListener extends AbstractEventListener
      */
     public function onBuild(BuildEvent $event)
     {
+        if (!defined('NET_SSH2_LOGGING')) {
+            define('NET_SSH2_LOGGING', SSH2::LOG_COMPLEX);
+        }
         $applicationEnvironment = $event->getTask()->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
 
@@ -58,7 +61,12 @@ class BuildEventListener extends AbstractEventListener
             $this->createFiles($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine('Creating symlinks');
             $this->createSymlinks($ssh, $applicationEnvironment);
-            $this->taskLoggerService->addLine($ssh->getLog());
+
+            $log = $ssh->getLog();
+            if ($log) {
+                $this->taskLoggerService->addLine('SSH log:');
+                $this->taskLoggerService->addLine($log);
+            }
         }
     }
 
