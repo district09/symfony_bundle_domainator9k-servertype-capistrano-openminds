@@ -18,4 +18,4 @@ services:
             - { name: kernel.event_listener, event: domainator.build, method: onBuild, priority: 30 }
     DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\DestroyEventListener:
         tags:
-            - { name: kernel.event_listener, event: domainator.destroy, method: onDestroy, priority: 90 }
+            - { name: kernel.event_listener, event: domainator.destroy, method: onDestroy, priority: 40c }
