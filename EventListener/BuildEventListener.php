@@ -83,6 +83,7 @@ class BuildEventListener extends AbstractEventListener
         $templateEntities = [
             'application_environment' => $applicationEnvironment,
             'application' => $applicationEnvironment->getApplication(),
+            'environment' => $applicationEnvironment->getEnvironment(),
         ];
 
         $locations = [];
@@ -107,6 +108,7 @@ class BuildEventListener extends AbstractEventListener
         $templateEntities = [
             'application_environment' => $applicationEnvironment,
             'application' => $applicationEnvironment->getApplication(),
+            'environment' => $applicationEnvironment->getEnvironment(),
         ];
 
         $capistranoSymlinks = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_symlink');
@@ -136,6 +138,7 @@ class BuildEventListener extends AbstractEventListener
         $templateEntities = [
             'application_environment' => $applicationEnvironment,
             'application' => $applicationEnvironment->getApplication(),
+            'environment' => $applicationEnvironment->getEnvironment(),
         ];
 
         $capistranoFiles = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_file');
