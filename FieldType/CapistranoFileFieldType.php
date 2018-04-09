@@ -38,7 +38,7 @@ class CapistranoFileFieldType extends AbstractCapistranoFieldType
      * @param $value
      * @return string
      */
-    public function encodeValue($value): string
+    public function encodeValue($value): ?string
     {
         return $this->encodeCapistranoValue($value);
     }
