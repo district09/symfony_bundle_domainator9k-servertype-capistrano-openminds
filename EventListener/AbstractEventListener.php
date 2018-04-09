@@ -76,13 +76,13 @@ abstract class AbstractEventListener
         $result = $ssh->exec($command, function ($tmp) use ($output) {
             $output .= $tmp;
         });
-        if (!$result) {
+        if ($result === false) {
             $this->taskLoggerService->addLine(sprintf('Command %s failed.', $command));
         }
         if ($output) {
             $this->taskLoggerService->addLine('SSH output:');
             $this->taskLoggerService->addLine($output);
         }
-        return $result;
+        return $result !== false;
     }
 }
