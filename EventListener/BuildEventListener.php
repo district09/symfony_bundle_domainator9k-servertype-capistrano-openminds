@@ -151,11 +151,14 @@ class BuildEventListener extends AbstractEventListener
                 $this->templateService->replaceKeys($path, $templateEntities)
             );
 
-            $content = escapeshellarg(
-                $this->templateService->replaceKeys($capistranoFile->getContent(), $templateEntities)
-            );
+            $content = $this->templateService->replaceKeys($capistranoFile->getContent(), $templateEntities);
+            $content = str_replace(["\r\n", "\r"], "\n", $content);
+            $content = escapeshellarg($content);
 
-            $command = 'echo ' . $content . ' > ' . $path;
+            $command = "[[ ! -f $path ]] || MOD=$(stat --format '%a' $path && chmod 600 $path)";
+            $command .= ' && echo ' . $content . ' > ' . $path;
+            $command .= ' && [[ -z "$MOD" ]] || chmod $MOD ' . $path;
+
             $this->executeSshCommand($ssh, $command);
         }
     }
