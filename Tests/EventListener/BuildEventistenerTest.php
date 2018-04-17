@@ -218,11 +218,14 @@ class BuildEventistenerTest extends AbstractEventistenerTest
             $entityManager,
             $tokenService
         );
-
+        $expectedCommand = "[[ ! -f '/path/to/location/file.ext' ]] || MOD=$(stat --format '%a' '/path/to/location/file.ext'"
+          . " && chmod 600 '/path/to/location/file.ext')"
+          . " && echo 'my-content' > '/path/to/location/file.ext'"
+          . " && [[ -z \"\$MOD\" ]] || chmod \$MOD '/path/to/location/file.ext'";
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo("echo 'my-content' > '/path/to/location/file.ext'"));
+            ->with($this->equalTo($expectedCommand));
 
         $applicationEnvironment = new ApplicationEnvironment();
 
