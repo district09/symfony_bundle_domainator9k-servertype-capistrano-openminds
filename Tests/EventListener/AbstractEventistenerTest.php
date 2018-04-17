@@ -89,7 +89,7 @@ abstract class AbstractEventistenerTest extends TestCase
         return $mock;
     }
 
-    private function getTokenServiceMock()
+    protected function getTokenServiceMock()
     {
         return $this->getMockBuilder(TokenService::class)
             ->disableOriginalConstructor()
