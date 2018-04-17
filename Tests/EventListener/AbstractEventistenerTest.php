@@ -5,7 +5,7 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests
 
 use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\BuildEventListener;
+use DigipolisGent\Domainator9k\CoreBundle\Service\TokenService;
 use DigipolisGent\SettingBundle\Service\DataValueService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -87,5 +87,12 @@ abstract class AbstractEventistenerTest extends TestCase
         }
 
         return $mock;
+    }
+
+    protected function getTokenServiceMock()
+    {
+        return $this->getMockBuilder(TokenService::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

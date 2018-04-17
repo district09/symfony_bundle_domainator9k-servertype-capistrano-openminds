@@ -50,6 +50,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $templateService = $this->getTemplateServiceMock();
         $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
+        $tokenService = $this->getTokenServiceMock();
 
         $serverRepository = $this->getRepositoryMock();
 
@@ -68,7 +69,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             ->expects($this->at(0))
             ->method('addLine');
 
-        $arguments = [$dataValueService, $templateService, $taskLoggerService, $entityManager];
+        $arguments = [$dataValueService, $templateService, $taskLoggerService, $entityManager, $tokenService];
         $methods = [
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
@@ -98,6 +99,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $templateService = $this->getTemplateServiceMock();
         $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
+        $tokenService = $this->getTokenServiceMock();
 
         $symlinks = new ArrayCollection();
         $symlink = new CapistranoSymlink();
@@ -118,7 +120,8 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             $dataValueService,
             $templateService,
             $taskLoggerService,
-            $entityManager
+            $entityManager,
+            $tokenService
         );
 
         $ssh = $this->getSsh2Mock();
@@ -138,6 +141,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $templateService = $this->getTemplateServiceMock();
         $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
+        $tokenService = $this->getTokenServiceMock();
 
         $folders = new ArrayCollection();
         $folder = new CapistranoFolder();
@@ -158,7 +162,8 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             $dataValueService,
             $templateService,
             $taskLoggerService,
-            $entityManager
+            $entityManager,
+            $tokenService
         );
 
         $ssh = $this->getSsh2Mock();

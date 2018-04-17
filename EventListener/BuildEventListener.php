@@ -81,6 +81,7 @@ class BuildEventListener extends AbstractEventListener
     public function createFolders(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         $templateEntities = [
+            'token' => $this->tokenService,
             'application_environment' => $applicationEnvironment,
             'application' => $applicationEnvironment->getApplication(),
             'environment' => $applicationEnvironment->getEnvironment(),
@@ -106,6 +107,7 @@ class BuildEventListener extends AbstractEventListener
     public function createSymlinks(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         $templateEntities = [
+            'token' => $this->tokenService,
             'application_environment' => $applicationEnvironment,
             'application' => $applicationEnvironment->getApplication(),
             'environment' => $applicationEnvironment->getEnvironment(),
@@ -136,6 +138,7 @@ class BuildEventListener extends AbstractEventListener
     public function createFiles(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         $templateEntities = [
+            'token' => $this->tokenService,
             'application_environment' => $applicationEnvironment,
             'application' => $applicationEnvironment->getApplication(),
             'environment' => $applicationEnvironment->getEnvironment(),

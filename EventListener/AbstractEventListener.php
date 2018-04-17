@@ -6,6 +6,7 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Event
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
+use DigipolisGent\Domainator9k\CoreBundle\Service\TokenService;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Exception\LoginFailedException;
 use DigipolisGent\SettingBundle\Service\DataValueService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +20,7 @@ abstract class AbstractEventListener
     protected $templateService;
     protected $taskLoggerService;
     protected $entityManager;
+    protected $tokenService;
 
     /**
      * BuildEventListener constructor.
@@ -29,12 +31,14 @@ abstract class AbstractEventListener
         DataValueService $dataValueService,
         TemplateService $templateService,
         TaskLoggerService $taskLoggerService,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        TokenService $tokenService
     ) {
         $this->dataValueService = $dataValueService;
         $this->templateService = $templateService;
         $this->taskLoggerService = $taskLoggerService;
         $this->entityManager = $entityManager;
+        $this->tokenService = $tokenService;
     }
 
     /**
