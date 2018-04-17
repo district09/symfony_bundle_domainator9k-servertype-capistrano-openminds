@@ -20,7 +20,7 @@ abstract class AbstractEventListener
     protected $templateService;
     protected $taskLoggerService;
     protected $entityManager;
-    private $tokenService;
+    protected $tokenService;
 
     /**
      * BuildEventListener constructor.
