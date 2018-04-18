@@ -94,7 +94,7 @@ class BuildEventListener extends AbstractEventListener
         }
 
         foreach ($locations as $location) {
-            $command = 'mkdir -p ' . $location;
+            $command = 'mkdir -p -m 750 ' . $location;
             $this->executeSshCommand($ssh, $command);
         }
     }
