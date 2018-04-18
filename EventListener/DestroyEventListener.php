@@ -27,6 +27,12 @@ class DestroyEventListener extends AbstractEventListener
         $servers = $this->entityManager->getRepository(VirtualServer::class)->findAll();
 
         foreach ($servers as $server) {
+            $manageCapistrano = $this->dataValueService->getValue($server, 'manage_capistrano');
+
+            if (!$manageCapistrano) {
+                continue;
+            }
+
             if ($server->getEnvironment() != $environment) {
                 continue;
             }
