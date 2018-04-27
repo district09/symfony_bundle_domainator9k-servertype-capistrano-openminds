@@ -185,11 +185,11 @@ class CapistranoCrontabLine
     {
         return sprintf(
             '%s %s %s %s %s %s',
-            $this->randomize($this->getMinute(), 59, 0),
-            $this->randomize($this->getHour(), 23, 0),
-            $this->randomize($this->getDayOfMonth(), 28),
-            $this->randomize($this->getMonthOfYear(), 12),
-            $this->randomize($this->getDayOfWeek(), 6),
+            $this->replaceRandom($this->getMinute(), 59, 0),
+            $this->replaceRandom($this->getHour(), 23, 0),
+            $this->replaceRandom($this->getDayOfMonth(), 28),
+            $this->replaceRandom($this->getMonthOfYear(), 12),
+            $this->replaceRandom($this->getDayOfWeek(), 6),
             $this->getCommand()
         );
     }
@@ -207,7 +207,7 @@ class CapistranoCrontabLine
      * @return string
      *  The randomized string.
      */
-    private function randomize($string, $max, $min = 1)
+    private function replaceRandom($string, $max, $min = 1)
     {
         return preg_replace_callback(
             '/H/',

@@ -145,7 +145,11 @@ class DestroyEventListener extends AbstractEventListener
     public function removeCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         if ($this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line')) {
-            $ssh->exec('(crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/### DOMAINATOR START ###.*### DOMAINATOR END ###\r*//\' | tr -s \'\r\' \'\n\') | crontab -');
+            $blockId = '### DOMAINATOR:';
+            $blockId .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
+            $blockId .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+
+            $ssh->exec('(crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | tr -s \'\r\' \'\n\') | crontab -');
         }
     }
 }

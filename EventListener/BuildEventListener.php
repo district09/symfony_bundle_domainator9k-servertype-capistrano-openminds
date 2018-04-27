@@ -174,23 +174,25 @@ class BuildEventListener extends AbstractEventListener
             'environment' => $applicationEnvironment->getEnvironment(),
         ];
 
+        $blockId = '### DOMAINATOR:';
+        $blockId .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
+        $blockId .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+
         $crontabLines = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line');
         $crontab = '';
 
         if ($crontabLines) {
-            $crontab .= "### DOMAINATOR START ###\n";
-
             /** @var CapistranoCrontabLine $crontabLine */
             foreach ($crontabLines as $crontabLine) {
                 $crontab .= $this->templateService->replaceKeys((string) $crontabLine, $templateEntities);
                 $crontab .= "\n";
             }
 
-            $crontab .= '### DOMAINATOR END ###';
+            $crontab = $blockId . "\n" . $crontab . $blockId;
             $crontab = escapeshellarg($crontab);
         }
 
-        $ssh->exec('(echo ' . $crontab . ' && (crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/### DOMAINATOR START ###.*### DOMAINATOR END ###\r*//\' | tr -s \'\r\' \'\n\')) | crontab -');
+        $ssh->exec('(echo ' . $crontab . ' && (crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | tr -s \'\r\' \'\n\')) | crontab -');
     }
 
 }
