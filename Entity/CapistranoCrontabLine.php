@@ -153,4 +153,43 @@ class CapistranoCrontabLine
     {
         $this->command = $command;
     }
+
+    /**
+     * @return string
+     *  The complete cron string.
+     */
+    public function __toString()
+    {
+        return sprintf('%s %s %s %s %s %s',
+            $this->randomize($this->getMinute(), 59, 0),
+            $this->randomize($this->getHour(), 23, 0),
+            $this->randomize($this->getDayOfMonth(), 28),
+            $this->randomize($this->getMonthOfYear(), 12),
+            $this->randomize($this->getDayOfWeek(), 6),
+            $this->getCommand()
+        );
+    }
+
+    /**
+     * Replace all "H" characters with a random value between $min and $max.
+     *
+     * @param string $value
+     *  The string with "H" characters.
+     * @param int $max
+     *  The maximum replacement value.
+     * @param int $min
+     *  The minimum replacement value.
+     *
+     * @return string
+     *  The randomized string.
+     */
+    private function randomize($string, $max, $min = 1) {
+        return preg_replace_callback(
+            '/H/',
+            function ($match) use ($min, $max) {
+                return mt_rand($min, $max);
+            },
+            $string
+        );
+    }
 }
