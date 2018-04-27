@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
  *
  * @ORM\Entity()
+ * @ORM\Table(name="capistrano_symlink")
  */
 class CapistranoSymlink
 {

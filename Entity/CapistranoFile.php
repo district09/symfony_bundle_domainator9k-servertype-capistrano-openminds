@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
  *
  * @ORM\Entity()
+ * @ORM\Table(name="capistrano_file")
  */
 class CapistranoFile
 {

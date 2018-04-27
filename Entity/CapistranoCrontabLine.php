@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
  *
  * @ORM\Entity()
+ * @ORM\Table(name="capistrano_crontab_line")
  */
 class CapistranoCrontabLine
 {
