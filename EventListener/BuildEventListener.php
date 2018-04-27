@@ -7,6 +7,7 @@ use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Event\BuildEvent;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoCrontabLine;
 use phpseclib\Net\SSH2;
 
 /**
@@ -65,6 +66,8 @@ class BuildEventListener extends AbstractEventListener
             $this->createFiles($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine('Creating symlinks');
             $this->createSymlinks($ssh, $applicationEnvironment);
+            $this->taskLoggerService->addLine('Creating crontab');
+            $this->createCrontab($ssh, $applicationEnvironment);
 
             $log = $ssh->getLog();
             if ($log) {
@@ -161,6 +164,36 @@ class BuildEventListener extends AbstractEventListener
 
             $this->executeSshCommand($ssh, $command);
         }
+    }
+
+    public function createCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    {
+        $templateEntities = [
+            'application_environment' => $applicationEnvironment,
+            'application' => $applicationEnvironment->getApplication(),
+            'environment' => $applicationEnvironment->getEnvironment(),
+        ];
+
+        $crontabLines = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line');
+        $crontab = '';
+
+        /** @var CapistranoCrontabLine $crontabLine */
+        foreach ($crontabLines as $crontabLine){
+            $crontab .= sprintf('%s %s %s %s %s %s',
+            $crontabLine->getMinute(),
+            $crontabLine->getHour(),
+            $crontabLine->getDayOfMonth(),
+            $crontabLine->getMonthOfYear(),
+            $crontabLine->getDayOfWeek(),
+            $this->templateService->replaceKeys($crontabLine->getCommand(),$templateEntities));
+
+            $crontab .= PHP_EOL;
+        }
+
+        $currentCrontab =  $ssh->exec('crontab -l');
+
+
+        $ssh->exec('echo "'.$crontab.'" | crontab ');
     }
 
 }

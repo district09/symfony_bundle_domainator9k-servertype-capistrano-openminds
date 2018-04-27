@@ -10,6 +10,9 @@ services:
     DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoSymlinkFieldType:
         tags:
             - { name: field_type}
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType\CapistranoCrontabLineFieldType:
+        tags:
+            - { name: field_type}
     DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provider\DataTypeProvider:
         tags:
             - { name: data_type_provider }

@@ -54,7 +54,7 @@ abstract class AbstractEventListener
             $key->setPassword($passphrase);
         }
         $key->loadKey(file_get_contents($keyLocation));
-
+        $key = 'capistrano';
         if (!$ssh->login($user, $key)) {
             throw new LoginFailedException('Login failed.');
         }
