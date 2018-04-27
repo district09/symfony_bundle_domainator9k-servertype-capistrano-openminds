@@ -7,6 +7,7 @@ use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Event\BuildEvent;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoCrontabLine;
 use phpseclib\Net\SSH2;
 
 /**
@@ -65,6 +66,8 @@ class BuildEventListener extends AbstractEventListener
             $this->createFiles($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine('Creating symlinks');
             $this->createSymlinks($ssh, $applicationEnvironment);
+            $this->taskLoggerService->addLine('Creating crontab');
+            $this->createCrontab($ssh, $applicationEnvironment);
 
             $log = $ssh->getLog();
             if ($log) {
@@ -161,6 +164,35 @@ class BuildEventListener extends AbstractEventListener
 
             $this->executeSshCommand($ssh, $command);
         }
+    }
+
+    public function createCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    {
+        $templateEntities = [
+            'application_environment' => $applicationEnvironment,
+            'application' => $applicationEnvironment->getApplication(),
+            'environment' => $applicationEnvironment->getEnvironment(),
+        ];
+
+        $blockId = '### DOMAINATOR:';
+        $blockId .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
+        $blockId .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+
+        $crontabLines = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line');
+        $crontab = '';
+
+        if ($crontabLines) {
+            /** @var CapistranoCrontabLine $crontabLine */
+            foreach ($crontabLines as $crontabLine) {
+                $crontab .= $this->templateService->replaceKeys((string) $crontabLine, $templateEntities);
+                $crontab .= "\n";
+            }
+
+            $crontab = $blockId . "\n" . $crontab . $blockId;
+            $crontab = escapeshellarg($crontab);
+        }
+
+        $ssh->exec('(echo ' . $crontab . ' && (crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | tr -s \'\r\' \'\n\')) | crontab -');
     }
 
 }

@@ -56,6 +56,13 @@ class DataTypeProvider implements DataTypeProviderInterface
                 'field_type' => 'capistrano_symlink',
                 'entity_types' => ['application_type_environment', 'application_environment'],
             ],
+            [
+                'key' => 'capistrano_crontab_line',
+                'label' => 'Capistrano crontab line',
+                'required' => false,
+                'field_type' => 'capistrano_crontab_line',
+                'entity_types' => ['application_type_environment', 'application_environment'],
+            ],
         ];
     }
 }

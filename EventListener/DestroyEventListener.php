@@ -58,6 +58,8 @@ class DestroyEventListener extends AbstractEventListener
             $this->removeSymlinks($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine('Removing directories');
             $this->removeFolders($ssh, $applicationEnvironment);
+            $this->taskLoggerService->addLine('Removing crontab');
+            $this->removeCrontab($ssh, $applicationEnvironment);
             $this->taskLoggerService->addLine($ssh->getLog());
         }
     }
@@ -133,6 +135,21 @@ class DestroyEventListener extends AbstractEventListener
         foreach ($locations as $location) {
             $command = 'rm -rf ' . $location;
             $this->executeSshCommand($ssh, $command);
+        }
+    }
+
+    /**
+     * @param SSH2 $ssh
+     * @param ApplicationEnvironment $applicationEnvironment
+     */
+    public function removeCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    {
+        if ($this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line')) {
+            $blockId = '### DOMAINATOR:';
+            $blockId .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
+            $blockId .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+
+            $ssh->exec('(crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | tr -s \'\r\' \'\n\') | crontab -');
         }
     }
 }
