@@ -177,23 +177,20 @@ class BuildEventListener extends AbstractEventListener
         $crontabLines = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line');
         $crontab = '';
 
-        /** @var CapistranoCrontabLine $crontabLine */
-        foreach ($crontabLines as $crontabLine){
-            $crontab .= sprintf('%s %s %s %s %s %s',
-            $crontabLine->getMinute(),
-            $crontabLine->getHour(),
-            $crontabLine->getDayOfMonth(),
-            $crontabLine->getMonthOfYear(),
-            $crontabLine->getDayOfWeek(),
-            $this->templateService->replaceKeys($crontabLine->getCommand(),$templateEntities));
+        if ($crontabLines) {
+            $crontab .= "### DOMAINATOR START ###\n";
 
-            $crontab .= PHP_EOL;
+            /** @var CapistranoCrontabLine $crontabLine */
+            foreach ($crontabLines as $crontabLine) {
+                $crontab .= $this->templateService->replaceKeys((string) $crontabLine, $templateEntities);
+                $crontab .= "\n";
+            }
+
+            $crontab .= '### DOMAINATOR END ###';
+            $crontab = escapeshellarg($crontab);
         }
 
-        $currentCrontab =  $ssh->exec('crontab -l');
-
-
-        $ssh->exec('echo "'.$crontab.'" | crontab ');
+        $ssh->exec('(echo ' . $crontab . ' && (crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/### DOMAINATOR START ###.*### DOMAINATOR END ###\r*//\' | tr -s \'\r\' \'\n\')) | crontab -');
     }
 
 }
