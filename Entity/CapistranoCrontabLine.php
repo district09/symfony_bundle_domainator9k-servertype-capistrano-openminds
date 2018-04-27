@@ -19,6 +19,13 @@ class CapistranoCrontabLine
     /**
      * @var string
      *
+     * @ORM\Column(name="name",type="string")
+     */
+    protected $name;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="minute",type="string")
      */
     protected $minute;
@@ -57,6 +64,22 @@ class CapistranoCrontabLine
      * @ORM\Column(name="command",type="string")
      */
     protected $command;
+
+    /**
+     * @return string
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name = null)
+    {
+        $this->name = $name;
+    }
 
     /**
      * @return string
@@ -160,7 +183,8 @@ class CapistranoCrontabLine
      */
     public function __toString()
     {
-        return sprintf('%s %s %s %s %s %s',
+        return sprintf(
+            '%s %s %s %s %s %s',
             $this->randomize($this->getMinute(), 59, 0),
             $this->randomize($this->getHour(), 23, 0),
             $this->randomize($this->getDayOfMonth(), 28),
@@ -183,7 +207,8 @@ class CapistranoCrontabLine
      * @return string
      *  The randomized string.
      */
-    private function randomize($string, $max, $min = 1) {
+    private function randomize($string, $max, $min = 1)
+    {
         return preg_replace_callback(
             '/H/',
             function ($match) use ($min, $max) {
