@@ -192,7 +192,7 @@ class BuildEventListener extends AbstractEventListener
             $crontab = escapeshellarg($crontab);
         }
 
-        $ssh->exec('(echo ' . $crontab . ' && (crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | tr -s \'\r\' \'\n\')) | crontab -');
+        $ssh->exec('(echo ' . $crontab . ' && (crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' | tr -s \'\r\' \'\n\')) | crontab -');
     }
 
 }
