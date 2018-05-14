@@ -174,25 +174,41 @@ class BuildEventListener extends AbstractEventListener
             'environment' => $applicationEnvironment->getEnvironment(),
         ];
 
-        $blockId = '### DOMAINATOR:';
-        $blockId .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
-        $blockId .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+        // Get the application specific string to wrap arround the crontab lines.
+        $wrapper = '### DOMAINATOR:';
+        $wrapper .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
+        $wrapper .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
 
+        // Build the command to strip the current crontab lines.
+        $command = 'crontab -l | ';
+        $command .= 'tr -s [:cntrl:] \'\r\' | ';
+        $command .= 'sed -e \'s/' . $wrapper . '.*' . $wrapper . '\r*//\' | ';
+        $command .= 'sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' |';
+        $command .= 'tr -s \'\r\' \'\n\'';
+
+        // Get the crontab lines.
         $crontabLines = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line');
-        $crontab = '';
 
-        if ($crontabLines) {
+        if (!$crontabLines || $ssh->host !== $applicationEnvironment->getWorkerServerIp()) {
+            // Remove the crontab lines.
+            $ssh->exec('(' . $command . ') | crontab -');
+        }
+        else {
+            // Build the application crontab lines.
+            $crontab = '';
             /** @var CapistranoCrontabLine $crontabLine */
             foreach ($crontabLines as $crontabLine) {
                 $crontab .= $this->templateService->replaceKeys((string) $crontabLine, $templateEntities);
                 $crontab .= "\n";
             }
 
-            $crontab = $blockId . "\n" . $crontab . $blockId;
+            // Wrap and escape them.
+            $crontab = $wrapper . "\n" . $crontab . $wrapper;
             $crontab = escapeshellarg($crontab);
-        }
 
-        $ssh->exec('(echo ' . $crontab . ' && (crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' | tr -s \'\r\' \'\n\')) | crontab -');
+            // Apply the changes on the server.
+            $ssh->exec('(echo ' . $crontab . ' && ' . $command . ') | crontab -');
+        }
     }
 
 }

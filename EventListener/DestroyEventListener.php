@@ -145,11 +145,20 @@ class DestroyEventListener extends AbstractEventListener
     public function removeCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
         if ($this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line')) {
-            $blockId = '### DOMAINATOR:';
-            $blockId .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
-            $blockId .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+            // Get the application specific string to wrap arround the crontab lines.
+            $wrapper = '### DOMAINATOR:';
+            $wrapper .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
+            $wrapper .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
 
-            $ssh->exec('(crontab -l | tr -s [:cntrl:] \'\r\' | sed -e \'s/' . $blockId . '.*' . $blockId . '\r*//\' | tr -s \'\r\' \'\n\') | crontab -');
+            // Build the command to strip the current crontab lines.
+            $command = 'crontab -l | ';
+            $command .= 'tr -s [:cntrl:] \'\r\' | ';
+            $command .= 'sed -e \'s/' . $wrapper . '.*' . $wrapper . '\r*//\' | ';
+            $command .= 'sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' |';
+            $command .= 'tr -s \'\r\' \'\n\'';
+
+            // Remove the crontab lines.
+            $ssh->exec('(' . $command . ') | crontab -');
         }
     }
 }
