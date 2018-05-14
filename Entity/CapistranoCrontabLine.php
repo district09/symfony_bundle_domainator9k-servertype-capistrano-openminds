@@ -62,7 +62,7 @@ class CapistranoCrontabLine
     /**
      * @var string
      *
-     * @ORM\Column(name="command",type="string")
+     * @ORM\Column(name="command",type="string",length=500)
      */
     protected $command;
 
