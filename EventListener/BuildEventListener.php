@@ -183,7 +183,7 @@ class BuildEventListener extends AbstractEventListener
         $command = 'crontab -l | ';
         $command .= 'tr -s [:cntrl:] \'\r\' | ';
         $command .= 'sed -e \'s/' . $wrapper . '.*' . $wrapper . '\r*//\' | ';
-        $command .= 'sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' |';
+        $command .= 'sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' | ';
         $command .= 'tr -s \'\r\' \'\n\'';
 
         // Get the crontab lines.
