@@ -54,7 +54,7 @@ class DestroyEventListener extends AbstractEventListener
                 $this->taskService->addSuccessLogMessage($this->task, 'Server cleaned.');
             } catch (\Exception $ex) {
                 if (empty($ssh)) {
-                    $this->taskService->addErrorLogMessage($this->task, $exception->getMessage());
+                    $this->taskService->addErrorLogMessage($this->task, $ex->getMessage());
                 }
 
                 $this->taskService->addFailedLogMessage($this->task, 'Cleanup failed.');
@@ -183,30 +183,31 @@ class DestroyEventListener extends AbstractEventListener
 
         if (!$this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line')) {
             $this->taskService->addInfoLogMessage($this->task, 'No crontab present.', 2);
-        } else {
-            // Get the application specific string to wrap arround the crontab lines.
-            $wrapper = '### DOMAINATOR:';
-            $wrapper .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
-            $wrapper .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+            return;
+        }
 
-            // Build the command to strip the current crontab lines.
-            $command = 'crontab -l | ';
-            $command .= 'tr -s [:cntrl:] \'\r\' | ';
-            $command .= 'sed -e \'s/' . $wrapper . '.*' . $wrapper . '\r*//\' | ';
-            $command .= 'sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' | ';
-            $command .= 'tr -s \'\r\' \'\n\'';
-            $command = '(' . $command . ') | crontab -';
+        // Get the application specific string to wrap arround the crontab lines.
+        $wrapper = '### DOMAINATOR:';
+        $wrapper .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
+        $wrapper .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
 
-            // Remove the crontab lines.
-            try {
-                $this->executeSshCommand($ssh, $command);
-            } catch (\Exception $ex) {
-                $this->taskService
-                    ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
-                    ->addFailedLogMessage($this->task, 'Removing crontab failed.', 2);
+        // Build the command to strip the current crontab lines.
+        $command = 'crontab -l | ';
+        $command .= 'tr -s [:cntrl:] \'\r\' | ';
+        $command .= 'sed -e \'s/' . $wrapper . '.*' . $wrapper . '\r*//\' | ';
+        $command .= 'sed -e \'s/#\s\+Edit this file[^\r]\+\r\(#\(\s[^\r]*\)\?\r\)*//\' | ';
+        $command .= 'tr -s \'\r\' \'\n\'';
+        $command = '(' . $command . ') | crontab -';
 
-                throw $ex;
-            }
+        // Remove the crontab lines.
+        try {
+            $this->executeSshCommand($ssh, $command);
+        } catch (\Exception $ex) {
+            $this->taskService
+                ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
+                ->addFailedLogMessage($this->task, 'Removing crontab failed.', 2);
+
+            throw $ex;
         }
     }
 }

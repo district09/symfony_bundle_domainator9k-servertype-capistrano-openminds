@@ -56,7 +56,7 @@ class BuildEventListener extends AbstractEventListener
                 $this->taskService->addSuccessLogMessage($this->task, 'Server provisioned.');
             } catch (\Exception $ex) {
                 if (empty($ssh)) {
-                    $this->taskService->addErrorLogMessage($this->task, $exception->getMessage());
+                    $this->taskService->addErrorLogMessage($this->task, $ex->getMessage());
                 }
 
                 $this->taskService->addFailedLogMessage($this->task, 'Provisioning failed.');
@@ -227,25 +227,25 @@ class BuildEventListener extends AbstractEventListener
                 $command = '(' . $command . ') | crontab -';
 
                 $this->executeSshCommand($ssh, $command);
+                return;
             }
-            else {
-                // Build the application crontab lines.
-                $crontab = '';
-                /** @var CapistranoCrontabLine $crontabLine */
-                foreach ($crontabLines as $crontabLine) {
-                    $crontab .= $this->templateService->replaceKeys((string) $crontabLine, $templateEntities);
-                    $crontab .= "\n";
-                }
 
-                // Wrap and escape them.
-                $crontab = $wrapper . "\n" . $crontab . $wrapper;
-                $crontab = escapeshellarg($crontab);
-
-                // Apply the changes on the server.
-                $command = '(echo ' . $crontab . ' && ' . $command . ') | crontab -';
-
-                $this->executeSshCommand($ssh, $command);
+            // Build the application crontab lines.
+            $crontab = '';
+            /** @var CapistranoCrontabLine $crontabLine */
+            foreach ($crontabLines as $crontabLine) {
+                $crontab .= $this->templateService->replaceKeys((string) $crontabLine, $templateEntities);
+                $crontab .= "\n";
             }
+
+            // Wrap and escape them.
+            $crontab = $wrapper . "\n" . $crontab . $wrapper;
+            $crontab = escapeshellarg($crontab);
+
+            // Apply the changes on the server.
+            $command = '(echo ' . $crontab . ' && ' . $command . ') | crontab -';
+
+            $this->executeSshCommand($ssh, $command);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
