@@ -70,7 +70,7 @@ abstract class AbstractEventListener
     {
         $this->taskService
             ->addLogHeader($this->task, 'Executing command', 2)
-            ->addInfoLogMessage($task, $command, 3);
+            ->addInfoLogMessage($this->task, $command, 3);
 
         $output = '';
         $result = $ssh->exec($command, function ($tmp) use ($output) {
