@@ -87,15 +87,18 @@ class DestroyEventListener extends AbstractEventListener
                 $path = $capistranoFile->getLocation();
                 $path .= '/' . $capistranoFile->getFilename();
                 $path .= '.' . $capistranoFile->getExtension();
+                $path = $this->templateService->replaceKeys($path, $templateEntities);
 
-                $path = escapeshellarg(
-                    $this->templateService->replaceKeys($path, $templateEntities)
+                $this->taskService->addInfoLogMessage(
+                    $this->task,
+                    sprintf('Removing "%s".', $path),
+                    2
                 );
 
-                $command = 'rm -f ' . $path;
-
-                $this->executeSshCommand($ssh, $command);
+                $this->executeSshCommand($ssh, 'rm -f ' . escapeshellarg($path));
             }
+
+            $this->taskService->addSuccessLogMessage($this->task, 'Files removed.', 2);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
@@ -130,8 +133,16 @@ class DestroyEventListener extends AbstractEventListener
                     $templateEntities
                 );
 
-                $this->executeSshCommand($ssh, 'rm ' . $source);
+                $this->taskService->addInfoLogMessage(
+                    $this->task,
+                    sprintf('Removing "%s".', $source),
+                    2
+                );
+
+                $this->executeSshCommand($ssh, 'rm ' . escapeshellarg($source));
             }
+
+            $this->taskService->addSuccessLogMessage($this->task, 'Symlinks removed.', 2);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
@@ -162,8 +173,16 @@ class DestroyEventListener extends AbstractEventListener
             foreach ($capistranoFolders as $capistranoFolder) {
                 $path = $this->templateService->replaceKeys($capistranoFolder->getLocation(), $templateEntities);
 
-                $this->executeSshCommand($ssh, 'rm -rf ' . $path);
+                $this->taskService->addInfoLogMessage(
+                    $this->task,
+                    sprintf('Removing "%s".', $path),
+                    2
+                );
+
+                $this->executeSshCommand($ssh, 'rm -rf ' . escapeshellarg($path));
             }
+
+            $this->taskService->addSuccessLogMessage($this->task, 'Directories removed.', 2);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
@@ -202,6 +221,7 @@ class DestroyEventListener extends AbstractEventListener
         // Remove the crontab lines.
         try {
             $this->executeSshCommand($ssh, $command);
+            $this->taskService->addSuccessLogMessage($this->task, 'Crontab removed.', 2);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)

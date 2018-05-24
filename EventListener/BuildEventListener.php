@@ -89,8 +89,16 @@ class BuildEventListener extends AbstractEventListener
             foreach ($capistranoFolders as $capistranoFolder) {
                 $path = $this->templateService->replaceKeys($capistranoFolder->getLocation(), $templateEntities);
 
-                $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . $path);
+                $this->taskService->addInfoLogMessage(
+                    $this->task,
+                    sprintf('Creating "%s".', $path),
+                    2
+                );
+
+                $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . escapeshellarg($path));
             }
+
+            $this->taskService->addSuccessLogMessage($this->task, 'Directories created.', 2);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
@@ -131,10 +139,18 @@ class BuildEventListener extends AbstractEventListener
                     $templateEntities
                 );
 
-                $command = 'ln -sfn ' . $destination . ' ' . $source;
+                $this->taskService->addInfoLogMessage(
+                    $this->task,
+                    sprintf('Symlinking "%s" to "%s".', $source, $destination),
+                    2
+                );
+
+                $command = 'ln -sfn ' . escapeshellarg($destination) . ' ' . escapeshellarg($source);
 
                 $this->executeSshCommand($ssh, $command);
             }
+
+            $this->taskService->addSuccessLogMessage($this->task, 'Symlinks created.', 2);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
@@ -168,10 +184,15 @@ class BuildEventListener extends AbstractEventListener
                 $path = $capistranoFile->getLocation();
                 $path .= '/' . $capistranoFile->getFilename();
                 $path .= '.' . $capistranoFile->getExtension();
+                $path = $this->templateService->replaceKeys($path, $templateEntities);
 
-                $path = escapeshellarg(
-                    $this->templateService->replaceKeys($path, $templateEntities)
+                $this->taskService->addInfoLogMessage(
+                    $this->task,
+                    sprintf('Creating "%s".', $path),
+                    2
                 );
+
+                $path = escapeshellarg($path);
 
                 $content = $this->templateService->replaceKeys($capistranoFile->getContent(), $templateEntities);
                 $content = str_replace(["\r\n", "\r"], "\n", $content);
@@ -182,6 +203,8 @@ class BuildEventListener extends AbstractEventListener
                 $command .= ' && [[ -z "$MOD" ]] || chmod $MOD ' . $path;
 
                 $this->executeSshCommand($ssh, $command);
+
+                $this->taskService->addSuccessLogMessage($this->task, 'Files created.', 2);
             }
         } catch (\Exception $ex) {
             $this->taskService
@@ -227,6 +250,7 @@ class BuildEventListener extends AbstractEventListener
                 $command = '(' . $command . ') | crontab -';
 
                 $this->executeSshCommand($ssh, $command);
+                $this->taskService->addSuccessLogMessage($this->task, 'Crontab cleared.', 2);
                 return;
             }
 
@@ -246,6 +270,8 @@ class BuildEventListener extends AbstractEventListener
             $command = '(echo ' . $crontab . ' && ' . $command . ') | crontab -';
 
             $this->executeSshCommand($ssh, $command);
+
+            $this->taskService->addSuccessLogMessage($this->task, 'Crontab created.', 2);
         } catch (\Exception $ex) {
             $this->taskService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
