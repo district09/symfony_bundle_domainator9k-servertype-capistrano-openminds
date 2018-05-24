@@ -3,9 +3,14 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\EventListener;
 
-use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\Environment;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
+use DigipolisGent\Domainator9k\CoreBundle\Service\TaskService;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\AbstractEventListener;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\BuildEventListener;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Fixtures\FooApplication;
 use DigipolisGent\SettingBundle\Service\DataValueService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -49,10 +54,10 @@ abstract class AbstractEventistenerTest extends TestCase
         return $mock;
     }
 
-    protected function getTaskLoggerServiceMock()
+    protected function getTaskServiceMock()
     {
         $mock = $this
-            ->getMockBuilder(TaskLoggerService::class)
+            ->getMockBuilder(TaskService::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -87,5 +92,49 @@ abstract class AbstractEventistenerTest extends TestCase
         }
 
         return $mock;
+    }
+
+    /**
+     * Call a protected/private method of an event listener.
+     *
+     * @param AbstractEventListener &$object
+     *   The event listener.
+     * @param string $methodName
+     *   Name of the method to call.
+     * @param array $args,..
+     *  Arguments to pass to method.
+     *
+     * @return mixed
+     *   Method return.
+     */
+    protected function invokeEventListenerMethod(AbstractEventListener $listener, $methodName)
+    {
+        $environment = new Environment();
+        $environment->setName('test');
+
+        $application = new FooApplication();
+
+        $applicationEnvironment = new ApplicationEnvironment();
+        $applicationEnvironment->setEnvironment($environment);
+        $applicationEnvironment->setApplication($application);
+
+        $task = new Task();
+        $task->setType($listener instanceof BuildEventListener ? Task::TYPE_BUILD : Task::TYPE_DESTROY);
+        $task->setStatus(Task::STATUS_NEW);
+        $task->setApplicationEnvironment($applicationEnvironment);
+
+        $reflection = new \ReflectionClass(get_class($listener));
+
+        $property = $reflection->getProperty('task');
+        $property->setAccessible(true);
+        $property->setValue($listener, $task);
+
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        $args = func_get_args();
+        $args = array_splice($args, 2);
+
+        return $method->invokeArgs($listener, $args);
     }
 }

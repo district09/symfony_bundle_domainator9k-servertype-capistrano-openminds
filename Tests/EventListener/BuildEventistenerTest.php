@@ -11,6 +11,7 @@ use DigipolisGent\Domainator9k\CoreBundle\Event\BuildEvent;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\AbstractEventListener;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\BuildEventListener;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Fixtures\FooApplication;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -49,7 +50,7 @@ class BuildEventistenerTest extends AbstractEventistenerTest
 
         $dataValueService = $this->getDataValueServiceMock([true,'user']);
         $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
+        $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $serverRepository = $this->getRepositoryMock();
@@ -65,11 +66,7 @@ class BuildEventistenerTest extends AbstractEventistenerTest
             ->with($this->equalTo(VirtualServer::class))
             ->willReturn($serverRepository);
 
-        $taskLoggerService
-            ->expects($this->at(0))
-            ->method('addLine');
-
-        $arguments = [$dataValueService, $templateService, $taskLoggerService, $entityManager];
+        $arguments = [$dataValueService, $templateService, $taskService, $entityManager];
         $methods = [
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
@@ -93,7 +90,7 @@ class BuildEventistenerTest extends AbstractEventistenerTest
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
+        $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $folders = new ArrayCollection();
@@ -114,26 +111,27 @@ class BuildEventistenerTest extends AbstractEventistenerTest
         $eventListener = new BuildEventListener(
             $dataValueService,
             $templateService,
-            $taskLoggerService,
+            $taskService,
             $entityManager
         );
 
+        $path = escapeshellarg('/path/to/my/location');
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo('mkdir -p /path/to/my/location'));
+            ->with($this->equalTo('mkdir -p -m 750 ' . $path));
 
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $eventListener->createFolders($ssh, $applicationEnvironment);
+        $this->invokeEventListenerMethod($eventListener, 'createFolders', $ssh, $applicationEnvironment);
     }
 
     public function testCreateSymlinks()
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
+        $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $symlinks = new ArrayCollection();
@@ -160,26 +158,28 @@ class BuildEventistenerTest extends AbstractEventistenerTest
         $eventListener = new BuildEventListener(
             $dataValueService,
             $templateService,
-            $taskLoggerService,
+            $taskService,
             $entityManager
         );
+
+        $destination = escapeshellarg('/path/to/my/destination');
+        $source = escapeshellarg('/path/to/my/source');
 
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo('ln -sfn /path/to/my/destination /path/to/my/source'));
-
+            ->with($this->equalTo('ln -sfn ' . $destination . ' ' . $source));
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $eventListener->createSymlinks($ssh, $applicationEnvironment);
+        $this->invokeEventListenerMethod($eventListener, 'createSymlinks', $ssh, $applicationEnvironment);
     }
 
     public function testCreateFiles()
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
+        $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $files = new ArrayCollection();
@@ -208,22 +208,24 @@ class BuildEventistenerTest extends AbstractEventistenerTest
         $eventListener = new BuildEventListener(
             $dataValueService,
             $templateService,
-            $taskLoggerService,
+            $taskService,
             $entityManager
         );
 
+        $path = escapeshellarg('/path/to/location/file.ext');
+        $content = escapeshellarg('my-content');
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
             ->with($this->equalTo(
-                "[[ ! -f '/path/to/location/file.ext' ]] || MOD=$(stat --format '%a' '/path/to/location/file.ext' "
-              . "&& chmod 600 '/path/to/location/file.ext') "
-              . "&& echo 'my-content' > '/path/to/location/file.ext' "
-              . "&& [[ -z \"\$MOD\" ]] || chmod \$MOD '/path/to/location/file.ext'"));
+                "[[ ! -f $path ]] || MOD=$(stat --format '%a' $path "
+              . "&& chmod 600 $path) "
+              . "&& echo $content > $path "
+              . "&& [[ -z \"\$MOD\" ]] || chmod \$MOD $path"));
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $eventListener->createFiles($ssh, $applicationEnvironment);
+        $this->invokeEventListenerMethod($eventListener, 'createFiles', $ssh, $applicationEnvironment);
     }
 
     private function getEventListenerMock(array $arguments, array $methods)

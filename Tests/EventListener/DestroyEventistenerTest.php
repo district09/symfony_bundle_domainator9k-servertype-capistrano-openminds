@@ -48,7 +48,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
 
         $dataValueService = $this->getDataValueServiceMock([true,'username']);
         $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
+        $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $serverRepository = $this->getRepositoryMock();
@@ -64,11 +64,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             ->with($this->equalTo(VirtualServer::class))
             ->willReturn($serverRepository);
 
-        $taskLoggerService
-            ->expects($this->at(0))
-            ->method('addLine');
-
-        $arguments = [$dataValueService, $templateService, $taskLoggerService, $entityManager];
+        $arguments = [$dataValueService, $templateService, $taskService, $entityManager];
         $methods = [
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
@@ -96,7 +92,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
+        $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $symlinks = new ArrayCollection();
@@ -117,26 +113,26 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $eventListener = new DestroyEventListener(
             $dataValueService,
             $templateService,
-            $taskLoggerService,
+            $taskService,
             $entityManager
         );
 
+        $source = escapeshellarg('/path/to/my/source');
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo('rm /path/to/my/source'));
-
+            ->with($this->equalTo('rm ' . $source));
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $eventListener->removeSymlinks($ssh, $applicationEnvironment);
+        $this->invokeEventListenerMethod($eventListener, 'removeSymlinks', $ssh, $applicationEnvironment);
     }
 
     public function testRemoveFolders()
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
+        $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $folders = new ArrayCollection();
@@ -157,19 +153,20 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $eventListener = new DestroyEventListener(
             $dataValueService,
             $templateService,
-            $taskLoggerService,
+            $taskService,
             $entityManager
         );
 
+        $path = escapeshellarg('/path/to/my/location');
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo('rm -rf /path/to/my/location'));
+            ->with($this->equalTo('rm -rf ' . $path));
 
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $eventListener->removeFolders($ssh, $applicationEnvironment);
+        $this->invokeEventListenerMethod($eventListener, 'removeFolders', $ssh, $applicationEnvironment);
     }
 
     private function getEventListenerMock(array $arguments, array $methods)
