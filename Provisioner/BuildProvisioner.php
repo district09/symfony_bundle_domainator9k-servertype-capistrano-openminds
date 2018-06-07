@@ -1,28 +1,27 @@
 <?php
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
-use DigipolisGent\Domainator9k\CoreBundle\Event\BuildEvent;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoCrontabLine;
 use phpseclib\Net\SSH2;
 
 /**
- * Class BuildEventListener
+ * Class BuildProvisioner
  *
- * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener
+ * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner
  */
-class BuildEventListener extends AbstractEventListener
+class BuildProvisioner extends AbstractProvisioner
 {
 
     /**
-     * @param BuildEvent $event
+     * @param Task $task
      */
-    public function onBuild(BuildEvent $event)
+    public function run(Task $task)
     {
-        $this->task = $event->getTask();
+        $this->task = $task;
 
         $applicationEnvironment = $this->task->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
@@ -60,7 +59,7 @@ class BuildEventListener extends AbstractEventListener
                 }
 
                 $this->taskService->addFailedLogMessage($this->task, 'Provisioning failed.');
-                $event->stopPropagation();
+                $this->task->setFailed();
                 return;
             }
         }

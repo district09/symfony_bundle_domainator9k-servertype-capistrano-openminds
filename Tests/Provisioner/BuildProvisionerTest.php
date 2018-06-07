@@ -1,23 +1,23 @@
 <?php
 
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Provisioner;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Environment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
-use DigipolisGent\Domainator9k\CoreBundle\Event\DestroyEvent;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\DestroyEventListener;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\BuildProvisioner;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Fixtures\FooApplication;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class DestroyEventistenerTest extends AbstractEventistenerTest
+class BuildProvisionerTest extends AbstractProvisionerTest
 {
 
-    public function testOnDestroy()
+    public function testOnBuild()
     {
         $application = new FooApplication();
 
@@ -40,13 +40,11 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $servers->add($server);
 
         $task = new Task();
-        $task->setType(Task::TYPE_DESTROY);
+        $task->setType(Task::TYPE_BUILD);
         $task->setStatus(Task::STATUS_NEW);
         $task->setApplicationEnvironment($applicationEnvironment);
 
-        $event = new DestroyEvent($task);
-
-        $dataValueService = $this->getDataValueServiceMock([true,'username']);
+        $dataValueService = $this->getDataValueServiceMock([true,'user']);
         $templateService = $this->getTemplateServiceMock();
         $taskService = $this->getTaskServiceMock();
         $entityManager = $this->getEntityManagerMock();
@@ -69,13 +67,10 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
             },
-            'removeFiles' => function () {
+            'createFolders' => function () {
                 return null;
             },
-            'removeSymlinks' => function () {
-                return null;
-            },
-            'removeFolders' => function () {
+            'createSymlinks' => function () {
                 return null;
             },
             'createFiles' => function () {
@@ -83,52 +78,11 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             }
         ];
 
-        $eventListener = $this->getEventListenerMock($arguments, $methods);
-        $eventListener->onDestroy($event);
+        $provisioner = $this->getProvisionerMock($arguments, $methods);
+        $provisioner->run($task);
     }
 
-
-    public function testRemoveSymlinks()
-    {
-        $dataValueService = $this->getDataValueServiceMock([]);
-        $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
-        $entityManager = $this->getEntityManagerMock();
-
-        $symlinks = new ArrayCollection();
-        $symlink = new CapistranoSymlink();
-        $symlink->setSourceLocation('/path/to/my/source');
-        $symlinks->add($symlink);
-
-        $dataValueService
-            ->expects($this->at(0))
-            ->method('getValue')
-            ->willReturn($symlinks);
-
-        $templateService
-            ->expects($this->at(0))
-            ->method('replaceKeys')
-            ->willReturn('/path/to/my/source');
-
-        $eventListener = new DestroyEventListener(
-            $dataValueService,
-            $templateService,
-            $taskService,
-            $entityManager
-        );
-
-        $source = escapeshellarg('/path/to/my/source');
-        $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
-            ->method('exec')
-            ->with($this->equalTo('rm ' . $source));
-
-        $applicationEnvironment = new ApplicationEnvironment();
-
-        $this->invokeEventListenerMethod($eventListener, 'removeSymlinks', $ssh, $applicationEnvironment);
-    }
-
-    public function testRemoveFolders()
+    public function testCreateFolders()
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
@@ -150,7 +104,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             ->method('replaceKeys')
             ->willReturn('/path/to/my/location');
 
-        $eventListener = new DestroyEventListener(
+        $provisioner = new BuildProvisioner(
             $dataValueService,
             $templateService,
             $taskService,
@@ -161,18 +115,119 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo('rm -rf ' . $path));
+            ->with($this->equalTo('mkdir -p -m 750 ' . $path));
 
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $this->invokeEventListenerMethod($eventListener, 'removeFolders', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'createFolders', $ssh, $applicationEnvironment);
     }
 
-    private function getEventListenerMock(array $arguments, array $methods)
+    public function testCreateSymlinks()
+    {
+        $dataValueService = $this->getDataValueServiceMock([]);
+        $templateService = $this->getTemplateServiceMock();
+        $taskService = $this->getTaskServiceMock();
+        $entityManager = $this->getEntityManagerMock();
+
+        $symlinks = new ArrayCollection();
+        $symlink = new CapistranoSymlink();
+        $symlink->setDestinationLocation('/path/to/my/destination');
+        $symlink->setSourceLocation('/path/to/my/source');
+        $symlinks->add($symlink);
+
+        $dataValueService
+            ->expects($this->at(0))
+            ->method('getValue')
+            ->willReturn($symlinks);
+
+        $templateService
+            ->expects($this->at(0))
+            ->method('replaceKeys')
+            ->willReturn('/path/to/my/source');
+
+        $templateService
+            ->expects($this->at(1))
+            ->method('replaceKeys')
+            ->willReturn('/path/to/my/destination');
+
+        $provisioner = new BuildProvisioner(
+            $dataValueService,
+            $templateService,
+            $taskService,
+            $entityManager
+        );
+
+        $destination = escapeshellarg('/path/to/my/destination');
+        $source = escapeshellarg('/path/to/my/source');
+
+        $ssh = $this->getSsh2Mock();
+        $ssh->expects($this->at(0))
+            ->method('exec')
+            ->with($this->equalTo('ln -sfn ' . $destination . ' ' . $source));
+
+        $applicationEnvironment = new ApplicationEnvironment();
+
+        $this->invokeProvisionerMethod($provisioner, 'createSymlinks', $ssh, $applicationEnvironment);
+    }
+
+    public function testCreateFiles()
+    {
+        $dataValueService = $this->getDataValueServiceMock([]);
+        $templateService = $this->getTemplateServiceMock();
+        $taskService = $this->getTaskServiceMock();
+        $entityManager = $this->getEntityManagerMock();
+
+        $files = new ArrayCollection();
+        $file = new CapistranoFile();
+        $file->setLocation('/path/to/location');
+        $file->setFilename('file');
+        $file->setExtension('ext');
+        $file->setContent('my content');
+        $files->add($file);
+
+        $dataValueService
+            ->expects($this->at(0))
+            ->method('getValue')
+            ->willReturn($files);
+
+        $templateService
+            ->expects($this->at(0))
+            ->method('replaceKeys')
+            ->willReturn('/path/to/location/file.ext');
+
+        $templateService
+            ->expects($this->at(1))
+            ->method('replaceKeys')
+            ->willReturn('my-content');
+
+        $provisioner = new BuildProvisioner(
+            $dataValueService,
+            $templateService,
+            $taskService,
+            $entityManager
+        );
+
+        $path = escapeshellarg('/path/to/location/file.ext');
+        $content = escapeshellarg('my-content');
+        $ssh = $this->getSsh2Mock();
+        $ssh->expects($this->at(0))
+            ->method('exec')
+            ->with($this->equalTo(
+                "[[ ! -f $path ]] || MOD=$(stat --format '%a' $path "
+              . "&& chmod 600 $path) "
+              . "&& echo $content > $path "
+              . "&& [[ -z \"\$MOD\" ]] || chmod \$MOD $path"));
+
+        $applicationEnvironment = new ApplicationEnvironment();
+
+        $this->invokeProvisionerMethod($provisioner, 'createFiles', $ssh, $applicationEnvironment);
+    }
+
+    private function getProvisionerMock(array $arguments, array $methods)
     {
         $mock = $this
-            ->getMockBuilder(DestroyEventListener::class)
+            ->getMockBuilder(BuildProvisioner::class)
             ->setMethods(array_keys($methods))
             ->setConstructorArgs($arguments)
             ->getMock();

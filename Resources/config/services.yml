@@ -16,9 +16,9 @@ services:
     DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provider\DataTypeProvider:
         tags:
             - { name: data_type_provider }
-    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\BuildEventListener:
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\BuildProvisioner:
         tags:
-            - { name: kernel.event_listener, event: domainator.build, method: onBuild, priority: 30 }
-    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\DestroyEventListener:
+            - { name: domainator.provisioner.build, priority: 30 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\DestroyProvisioner:
         tags:
-            - { name: kernel.event_listener, event: domainator.destroy, method: onDestroy, priority: 40 }
+           - { name: domainator.provisioner.destroy, priority: 40 }

@@ -1,26 +1,26 @@
 <?php
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
-use DigipolisGent\Domainator9k\CoreBundle\Event\DestroyEvent;
 use phpseclib\Net\SSH2;
 
 /**
- * Class DestroyEventListener
+ * Class DestroyProvisioner
  *
- * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener
+ * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner
  */
-class DestroyEventListener extends AbstractEventListener
+class DestroyProvisioner extends AbstractProvisioner
 {
 
     /**
-     * @param DestroyEvent $event
+     * @param Task $task
      */
-    public function onDestroy(DestroyEvent $event)
+    public function run(Task $task)
     {
-        $this->task = $event->getTask();
+        $this->task = $task;
 
         $applicationEnvironment = $this->task->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
@@ -58,7 +58,7 @@ class DestroyEventListener extends AbstractEventListener
                 }
 
                 $this->taskService->addFailedLogMessage($this->task, 'Cleanup failed.');
-                $event->stopPropagation();
+                $this->task->setFailed();
                 return;
             }
         }

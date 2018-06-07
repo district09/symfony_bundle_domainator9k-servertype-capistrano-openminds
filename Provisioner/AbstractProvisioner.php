@@ -1,9 +1,9 @@
 <?php
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner;
 
-use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
+use DigipolisGent\Domainator9k\CoreBundle\Provisioner\ProvisionerInterface;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TaskService;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Exception\LoginFailedException;
@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SSH2;
 
-abstract class AbstractEventListener
+abstract class AbstractProvisioner implements ProvisionerInterface
 {
 
     protected $dataValueService;
