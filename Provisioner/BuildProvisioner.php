@@ -284,5 +284,4 @@ class BuildProvisioner extends AbstractProvisioner
     {
         return 'Capistrano files and folders';
     }
-
 }
