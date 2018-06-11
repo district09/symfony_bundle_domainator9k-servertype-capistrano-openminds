@@ -46,7 +46,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
 
         $dataValueService = $this->getDataValueServiceMock([true,'user']);
         $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
+        $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $serverRepository = $this->getRepositoryMock();
@@ -62,7 +62,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
             ->with($this->equalTo(VirtualServer::class))
             ->willReturn($serverRepository);
 
-        $arguments = [$dataValueService, $templateService, $taskService, $entityManager];
+        $arguments = [$dataValueService, $templateService, $taskLoggerService, $entityManager];
         $methods = [
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
@@ -86,7 +86,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
+        $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $folders = new ArrayCollection();
@@ -107,7 +107,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
         $provisioner = new BuildProvisioner(
             $dataValueService,
             $templateService,
-            $taskService,
+            $taskLoggerService,
             $entityManager
         );
 
@@ -127,7 +127,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
+        $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $symlinks = new ArrayCollection();
@@ -154,7 +154,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
         $provisioner = new BuildProvisioner(
             $dataValueService,
             $templateService,
-            $taskService,
+            $taskLoggerService,
             $entityManager
         );
 
@@ -175,7 +175,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
+        $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $files = new ArrayCollection();
@@ -204,7 +204,7 @@ class BuildProvisionerTest extends AbstractProvisionerTest
         $provisioner = new BuildProvisioner(
             $dataValueService,
             $templateService,
-            $taskService,
+            $taskLoggerService,
             $entityManager
         );
 

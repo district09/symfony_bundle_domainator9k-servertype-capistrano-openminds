@@ -45,7 +45,7 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
 
         $dataValueService = $this->getDataValueServiceMock([true,'username']);
         $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
+        $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $serverRepository = $this->getRepositoryMock();
@@ -61,7 +61,7 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
             ->with($this->equalTo(VirtualServer::class))
             ->willReturn($serverRepository);
 
-        $arguments = [$dataValueService, $templateService, $taskService, $entityManager];
+        $arguments = [$dataValueService, $templateService, $taskLoggerService, $entityManager];
         $methods = [
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
@@ -89,7 +89,7 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
+        $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $symlinks = new ArrayCollection();
@@ -110,7 +110,7 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
         $provisioner = new DestroyProvisioner(
             $dataValueService,
             $templateService,
-            $taskService,
+            $taskLoggerService,
             $entityManager
         );
 
@@ -129,7 +129,7 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
     {
         $dataValueService = $this->getDataValueServiceMock([]);
         $templateService = $this->getTemplateServiceMock();
-        $taskService = $this->getTaskServiceMock();
+        $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
 
         $folders = new ArrayCollection();
@@ -150,7 +150,7 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
         $provisioner = new DestroyProvisioner(
             $dataValueService,
             $templateService,
-            $taskService,
+            $taskLoggerService,
             $entityManager
         );
 

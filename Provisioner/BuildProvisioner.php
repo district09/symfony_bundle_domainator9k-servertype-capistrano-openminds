@@ -38,7 +38,7 @@ class BuildProvisioner extends AbstractProvisioner
                 continue;
             }
 
-            $this->taskService->addLogHeader(
+            $this->taskLoggerService->addLogHeader(
                 $this->task,
                 sprintf('Capistrano server "%s"', $server->getName())
             );
@@ -52,13 +52,13 @@ class BuildProvisioner extends AbstractProvisioner
                 $this->createSymlinks($ssh, $applicationEnvironment);
                 $this->createCrontab($ssh, $applicationEnvironment);
 
-                $this->taskService->addSuccessLogMessage($this->task, 'Server provisioned.');
+                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Server provisioned.');
             } catch (\Exception $ex) {
                 if (empty($ssh)) {
-                    $this->taskService->addErrorLogMessage($this->task, $ex->getMessage());
+                    $this->taskLoggerService->addErrorLogMessage($this->task, $ex->getMessage());
                 }
 
-                $this->taskService->addFailedLogMessage($this->task, 'Provisioning failed.');
+                $this->taskLoggerService->addFailedLogMessage($this->task, 'Provisioning failed.');
                 $this->task->setFailed();
                 return;
             }
@@ -71,10 +71,10 @@ class BuildProvisioner extends AbstractProvisioner
      */
     protected function createFolders(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating directories', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating directories', 1);
 
         if (!$capistranoFolders = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_folder')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No directories specified.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No directories specified.', 2);
             return;
         }
 
@@ -88,7 +88,7 @@ class BuildProvisioner extends AbstractProvisioner
             foreach ($capistranoFolders as $capistranoFolder) {
                 $path = $this->templateService->replaceKeys($capistranoFolder->getLocation(), $templateEntities);
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Creating "%s".', $path),
                     2
@@ -97,9 +97,9 @@ class BuildProvisioner extends AbstractProvisioner
                 $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . escapeshellarg($path));
             }
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Directories created.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories created.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating directories failed.', 2);
 
@@ -113,10 +113,10 @@ class BuildProvisioner extends AbstractProvisioner
      */
     protected function createSymlinks(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating symlinks', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating symlinks', 1);
 
         if (!$capistranoSymlinks = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_symlink')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No symlinks specified.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No symlinks specified.', 2);
             return;
         }
 
@@ -138,7 +138,7 @@ class BuildProvisioner extends AbstractProvisioner
                     $templateEntities
                 );
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Symlinking "%s" to "%s".', $source, $destination),
                     2
@@ -149,9 +149,9 @@ class BuildProvisioner extends AbstractProvisioner
                 $this->executeSshCommand($ssh, $command);
             }
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Symlinks created.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Symlinks created.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating symlinks failed.', 2);
 
@@ -165,10 +165,10 @@ class BuildProvisioner extends AbstractProvisioner
      */
     protected function createFiles(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating files', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating files', 1);
 
         if (!$capistranoFiles = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_file')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No files specified.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No files specified.', 2);
             return;
         }
 
@@ -185,7 +185,7 @@ class BuildProvisioner extends AbstractProvisioner
                 $path .= '.' . $capistranoFile->getExtension();
                 $path = $this->templateService->replaceKeys($path, $templateEntities);
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Creating "%s".', $path),
                     2
@@ -203,10 +203,10 @@ class BuildProvisioner extends AbstractProvisioner
 
                 $this->executeSshCommand($ssh, $command);
 
-                $this->taskService->addSuccessLogMessage($this->task, 'Files created.', 2);
+                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
             }
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating files failed.', 2);
 
@@ -220,7 +220,7 @@ class BuildProvisioner extends AbstractProvisioner
      */
     protected function createCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating crontab', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating crontab', 1);
 
         $templateEntities = [
             'application_environment' => $applicationEnvironment,
@@ -249,7 +249,7 @@ class BuildProvisioner extends AbstractProvisioner
                 $command = '(' . $command . ') | crontab -';
 
                 $this->executeSshCommand($ssh, $command);
-                $this->taskService->addSuccessLogMessage($this->task, 'Crontab cleared.', 2);
+                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Crontab cleared.', 2);
                 return;
             }
 
@@ -270,14 +270,19 @@ class BuildProvisioner extends AbstractProvisioner
 
             $this->executeSshCommand($ssh, $command);
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Crontab created.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Crontab created.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating crontab failed.', 2);
 
             throw $ex;
         }
+    }
+
+    public function getName()
+    {
+        return 'Capistrano files and folders';
     }
 
 }
