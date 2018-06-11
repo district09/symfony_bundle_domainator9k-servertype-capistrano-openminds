@@ -15,13 +15,8 @@ use phpseclib\Net\SSH2;
 class DestroyProvisioner extends AbstractProvisioner
 {
 
-    /**
-     * @param Task $task
-     */
-    public function run(Task $task)
+    public function doRun()
     {
-        $this->task = $task;
-
         $applicationEnvironment = $this->task->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
 
@@ -58,8 +53,7 @@ class DestroyProvisioner extends AbstractProvisioner
                 }
 
                 $this->taskLoggerService->addFailedLogMessage($this->task, 'Cleanup failed.');
-                $this->task->setFailed();
-                return;
+                throw new LoggedException('', 0, $ex);
             }
         }
     }

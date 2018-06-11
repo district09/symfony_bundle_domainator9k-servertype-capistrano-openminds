@@ -5,6 +5,7 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provi
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
+use DigipolisGent\Domainator9k\CoreBundle\Exception\LoggedException;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoCrontabLine;
 use phpseclib\Net\SSH2;
 
@@ -16,13 +17,8 @@ use phpseclib\Net\SSH2;
 class BuildProvisioner extends AbstractProvisioner
 {
 
-    /**
-     * @param Task $task
-     */
-    public function run(Task $task)
+    public function doRun()
     {
-        $this->task = $task;
-
         $applicationEnvironment = $this->task->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
 
@@ -59,8 +55,7 @@ class BuildProvisioner extends AbstractProvisioner
                 }
 
                 $this->taskLoggerService->addFailedLogMessage($this->task, 'Provisioning failed.');
-                $this->task->setFailed();
-                return;
+                throw new LoggedException('', 0, $ex);
             }
         }
     }

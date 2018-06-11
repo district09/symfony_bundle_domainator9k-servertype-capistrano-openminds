@@ -79,7 +79,8 @@ class BuildProvisionerTest extends AbstractProvisionerTest
         ];
 
         $provisioner = $this->getProvisionerMock($arguments, $methods);
-        $provisioner->run($task);
+        $provisioner->setTask($task);
+        $provisioner->run();
     }
 
     public function testCreateFolders()
