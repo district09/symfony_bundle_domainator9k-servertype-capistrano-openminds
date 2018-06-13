@@ -1,29 +1,24 @@
 <?php
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
-use DigipolisGent\Domainator9k\CoreBundle\Event\BuildEvent;
+use DigipolisGent\Domainator9k\CoreBundle\Exception\LoggedException;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoCrontabLine;
 use phpseclib\Net\SSH2;
 
 /**
- * Class BuildEventListener
+ * Class BuildProvisioner
  *
- * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener
+ * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner
  */
-class BuildEventListener extends AbstractEventListener
+class BuildProvisioner extends AbstractProvisioner
 {
 
-    /**
-     * @param BuildEvent $event
-     */
-    public function onBuild(BuildEvent $event)
+    public function doRun()
     {
-        $this->task = $event->getTask();
-
         $applicationEnvironment = $this->task->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
 
@@ -39,7 +34,7 @@ class BuildEventListener extends AbstractEventListener
                 continue;
             }
 
-            $this->taskService->addLogHeader(
+            $this->taskLoggerService->addLogHeader(
                 $this->task,
                 sprintf('Capistrano server "%s"', $server->getName())
             );
@@ -53,15 +48,14 @@ class BuildEventListener extends AbstractEventListener
                 $this->createSymlinks($ssh, $applicationEnvironment);
                 $this->createCrontab($ssh, $applicationEnvironment);
 
-                $this->taskService->addSuccessLogMessage($this->task, 'Server provisioned.');
+                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Server provisioned.');
             } catch (\Exception $ex) {
                 if (empty($ssh)) {
-                    $this->taskService->addErrorLogMessage($this->task, $ex->getMessage());
+                    $this->taskLoggerService->addErrorLogMessage($this->task, $ex->getMessage());
                 }
 
-                $this->taskService->addFailedLogMessage($this->task, 'Provisioning failed.');
-                $event->stopPropagation();
-                return;
+                $this->taskLoggerService->addFailedLogMessage($this->task, 'Provisioning failed.');
+                throw new LoggedException('', 0, $ex);
             }
         }
     }
@@ -72,10 +66,10 @@ class BuildEventListener extends AbstractEventListener
      */
     protected function createFolders(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating directories', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating directories', 1);
 
         if (!$capistranoFolders = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_folder')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No directories specified.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No directories specified.', 2);
             return;
         }
 
@@ -89,7 +83,7 @@ class BuildEventListener extends AbstractEventListener
             foreach ($capistranoFolders as $capistranoFolder) {
                 $path = $this->templateService->replaceKeys($capistranoFolder->getLocation(), $templateEntities);
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Creating "%s".', $path),
                     2
@@ -98,9 +92,9 @@ class BuildEventListener extends AbstractEventListener
                 $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . escapeshellarg($path));
             }
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Directories created.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories created.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating directories failed.', 2);
 
@@ -114,10 +108,10 @@ class BuildEventListener extends AbstractEventListener
      */
     protected function createSymlinks(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating symlinks', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating symlinks', 1);
 
         if (!$capistranoSymlinks = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_symlink')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No symlinks specified.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No symlinks specified.', 2);
             return;
         }
 
@@ -139,7 +133,7 @@ class BuildEventListener extends AbstractEventListener
                     $templateEntities
                 );
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Symlinking "%s" to "%s".', $source, $destination),
                     2
@@ -150,9 +144,9 @@ class BuildEventListener extends AbstractEventListener
                 $this->executeSshCommand($ssh, $command);
             }
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Symlinks created.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Symlinks created.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating symlinks failed.', 2);
 
@@ -166,10 +160,10 @@ class BuildEventListener extends AbstractEventListener
      */
     protected function createFiles(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating files', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating files', 1);
 
         if (!$capistranoFiles = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_file')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No files specified.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No files specified.', 2);
             return;
         }
 
@@ -186,7 +180,7 @@ class BuildEventListener extends AbstractEventListener
                 $path .= '.' . $capistranoFile->getExtension();
                 $path = $this->templateService->replaceKeys($path, $templateEntities);
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Creating "%s".', $path),
                     2
@@ -204,10 +198,10 @@ class BuildEventListener extends AbstractEventListener
 
                 $this->executeSshCommand($ssh, $command);
 
-                $this->taskService->addSuccessLogMessage($this->task, 'Files created.', 2);
+                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
             }
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating files failed.', 2);
 
@@ -221,7 +215,7 @@ class BuildEventListener extends AbstractEventListener
      */
     protected function createCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Creating crontab', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Creating crontab', 1);
 
         $templateEntities = [
             'application_environment' => $applicationEnvironment,
@@ -250,7 +244,7 @@ class BuildEventListener extends AbstractEventListener
                 $command = '(' . $command . ') | crontab -';
 
                 $this->executeSshCommand($ssh, $command);
-                $this->taskService->addSuccessLogMessage($this->task, 'Crontab cleared.', 2);
+                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Crontab cleared.', 2);
                 return;
             }
 
@@ -271,9 +265,9 @@ class BuildEventListener extends AbstractEventListener
 
             $this->executeSshCommand($ssh, $command);
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Crontab created.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Crontab created.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Creating crontab failed.', 2);
 
@@ -281,4 +275,8 @@ class BuildEventListener extends AbstractEventListener
         }
     }
 
+    public function getName()
+    {
+        return 'Capistrano files and folders';
+    }
 }

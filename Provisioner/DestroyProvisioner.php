@@ -1,27 +1,22 @@
 <?php
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
+use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
-use DigipolisGent\Domainator9k\CoreBundle\Event\DestroyEvent;
 use phpseclib\Net\SSH2;
 
 /**
- * Class DestroyEventListener
+ * Class DestroyProvisioner
  *
- * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener
+ * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner
  */
-class DestroyEventListener extends AbstractEventListener
+class DestroyProvisioner extends AbstractProvisioner
 {
 
-    /**
-     * @param DestroyEvent $event
-     */
-    public function onDestroy(DestroyEvent $event)
+    public function doRun()
     {
-        $this->task = $event->getTask();
-
         $applicationEnvironment = $this->task->getApplicationEnvironment();
         $environment = $applicationEnvironment->getEnvironment();
 
@@ -37,7 +32,7 @@ class DestroyEventListener extends AbstractEventListener
                 continue;
             }
 
-            $this->taskService->addLogHeader(
+            $this->taskLoggerService->addLogHeader(
                 $this->task,
                 sprintf('Capistrano server "%s"', $server->getName())
             );
@@ -51,15 +46,14 @@ class DestroyEventListener extends AbstractEventListener
                 $this->removeFiles($ssh, $applicationEnvironment);
                 $this->removeFolders($ssh, $applicationEnvironment);
 
-                $this->taskService->addSuccessLogMessage($this->task, 'Server cleaned.');
+                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Server cleaned.');
             } catch (\Exception $ex) {
                 if (empty($ssh)) {
-                    $this->taskService->addErrorLogMessage($this->task, $ex->getMessage());
+                    $this->taskLoggerService->addErrorLogMessage($this->task, $ex->getMessage());
                 }
 
-                $this->taskService->addFailedLogMessage($this->task, 'Cleanup failed.');
-                $event->stopPropagation();
-                return;
+                $this->taskLoggerService->addFailedLogMessage($this->task, 'Cleanup failed.');
+                throw new LoggedException('', 0, $ex);
             }
         }
     }
@@ -70,10 +64,10 @@ class DestroyEventListener extends AbstractEventListener
      */
     protected function removeFiles(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Removing files', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Removing files', 1);
 
         if (!$capistranoFiles = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_file')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No files present.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No files present.', 2);
             return;
         }
 
@@ -89,7 +83,7 @@ class DestroyEventListener extends AbstractEventListener
                 $path .= '.' . $capistranoFile->getExtension();
                 $path = $this->templateService->replaceKeys($path, $templateEntities);
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Removing "%s".', $path),
                     2
@@ -98,9 +92,9 @@ class DestroyEventListener extends AbstractEventListener
                 $this->executeSshCommand($ssh, 'rm -f ' . escapeshellarg($path));
             }
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Files removed.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files removed.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Removing files failed.', 2);
 
@@ -114,10 +108,10 @@ class DestroyEventListener extends AbstractEventListener
      */
     protected function removeSymlinks(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Removing symlinks', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Removing symlinks', 1);
 
         if (!$capistranoSymlinks = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_symlink')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No symlinks present.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No symlinks present.', 2);
             return;
         }
 
@@ -133,7 +127,7 @@ class DestroyEventListener extends AbstractEventListener
                     $templateEntities
                 );
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Removing "%s".', $source),
                     2
@@ -142,9 +136,9 @@ class DestroyEventListener extends AbstractEventListener
                 $this->executeSshCommand($ssh, 'rm ' . escapeshellarg($source));
             }
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Symlinks removed.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Symlinks removed.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Removing symlinks failed.', 2);
 
@@ -158,10 +152,10 @@ class DestroyEventListener extends AbstractEventListener
      */
     protected function removeFolders(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Removing directories', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Removing directories', 1);
 
         if (!$capistranoFolders = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_folder')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No directories present.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No directories present.', 2);
         }
 
         $templateEntities = [
@@ -173,7 +167,7 @@ class DestroyEventListener extends AbstractEventListener
             foreach ($capistranoFolders as $capistranoFolder) {
                 $path = $this->templateService->replaceKeys($capistranoFolder->getLocation(), $templateEntities);
 
-                $this->taskService->addInfoLogMessage(
+                $this->taskLoggerService->addInfoLogMessage(
                     $this->task,
                     sprintf('Removing "%s".', $path),
                     2
@@ -182,9 +176,9 @@ class DestroyEventListener extends AbstractEventListener
                 $this->executeSshCommand($ssh, 'rm -rf ' . escapeshellarg($path));
             }
 
-            $this->taskService->addSuccessLogMessage($this->task, 'Directories removed.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories removed.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Removing directories failed.', 2);
 
@@ -198,10 +192,10 @@ class DestroyEventListener extends AbstractEventListener
      */
     protected function removeCrontab(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
     {
-        $this->taskService->addLogHeader($this->task, 'Removing crontab', 1);
+        $this->taskLoggerService->addLogHeader($this->task, 'Removing crontab', 1);
 
         if (!$this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line')) {
-            $this->taskService->addInfoLogMessage($this->task, 'No crontab present.', 2);
+            $this->taskLoggerService->addInfoLogMessage($this->task, 'No crontab present.', 2);
             return;
         }
 
@@ -221,13 +215,18 @@ class DestroyEventListener extends AbstractEventListener
         // Remove the crontab lines.
         try {
             $this->executeSshCommand($ssh, $command);
-            $this->taskService->addSuccessLogMessage($this->task, 'Crontab removed.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Crontab removed.', 2);
         } catch (\Exception $ex) {
-            $this->taskService
+            $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
                 ->addFailedLogMessage($this->task, 'Removing crontab failed.', 2);
 
             throw $ex;
         }
+    }
+
+    public function getName()
+    {
+        return 'Capistrano files and folders';
     }
 }

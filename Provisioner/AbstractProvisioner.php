@@ -1,10 +1,10 @@
 <?php
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner;
 
-use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
-use DigipolisGent\Domainator9k\CoreBundle\Service\TaskService;
+use DigipolisGent\Domainator9k\CoreBundle\Provisioner\AbstractProvisioner as AbstractProvisionerCore;
+use DigipolisGent\Domainator9k\CoreBundle\Service\TaskLoggerService;
 use DigipolisGent\Domainator9k\CoreBundle\Service\TemplateService;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Exception\LoginFailedException;
 use DigipolisGent\SettingBundle\Service\DataValueService;
@@ -12,24 +12,24 @@ use Doctrine\ORM\EntityManagerInterface;
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SSH2;
 
-abstract class AbstractEventListener
+abstract class AbstractProvisioner extends AbstractProvisionerCore
 {
 
     protected $dataValueService;
     protected $templateService;
-    protected $taskService;
+    protected $taskLoggerService;
     protected $entityManager;
     protected $task;
 
     public function __construct(
         DataValueService $dataValueService,
         TemplateService $templateService,
-        TaskService $taskService,
+        TaskLoggerService $taskLoggerService,
         EntityManagerInterface $entityManager
     ) {
         $this->dataValueService = $dataValueService;
         $this->templateService = $templateService;
-        $this->taskService = $taskService;
+        $this->taskLoggerService = $taskLoggerService;
         $this->entityManager = $entityManager;
     }
 
@@ -68,7 +68,7 @@ abstract class AbstractEventListener
      */
     protected function executeSshCommand(SSH2 $ssh, $command)
     {
-        $this->taskService
+        $this->taskLoggerService
             ->addLogHeader($this->task, 'Executing command', 2)
             ->addInfoLogMessage($this->task, $command, 3);
 
@@ -78,22 +78,22 @@ abstract class AbstractEventListener
         });
 
         if ($output !== '') {
-            $type = $this->taskService::LOG_TYPE_INFO;
+            $type = $this->taskLoggerService::LOG_TYPE_INFO;
 
             if ($result === false) {
-                $type = $this->taskService::LOG_TYPE_ERROR;
+                $type = $this->taskLoggerService::LOG_TYPE_ERROR;
             }
 
-            $this->taskService->addLogMessage($this->task, $type, $output, 3, false);
+            $this->taskLoggerService->addLogMessage($this->task, $type, $output, 3, false);
         }
 
         if ($result === false) {
-            $this->taskService->addFailedLogMessage($this->task, 'Command failed.', 3);
+            $this->taskLoggerService->addFailedLogMessage($this->task, 'Command failed.', 3);
 
             throw new \Exception('Could not execute command.');
         }
 
-        $this->taskService->addSuccessLogMessage($this->task, 'Command executed.', 3);
+        $this->taskLoggerService->addSuccessLogMessage($this->task, 'Command executed.', 3);
 
         return $output;
     }
