@@ -91,7 +91,7 @@ class CapistranoFile
     /**
      * @param string $filename
      */
-    public function setFilename(string $filename)
+    public function setFilename(?string $filename)
     {
         $this->filename = $filename;
     }
