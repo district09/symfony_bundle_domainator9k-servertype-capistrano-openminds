@@ -186,32 +186,34 @@ class BuildProvisioner extends AbstractProvisioner
                     2
                 );
 
-                $tmpPath = escapeshellarg($path . uniqid('', true) . '.tmp');
+                $tmpPath = escapeshellarg($path . uniqid('.', true) . '.tmp');
                 $path = escapeshellarg($path);
 
                 $content = $this->templateService->replaceKeys($capistranoFile->getContent(), $templateEntities);
                 $content = str_replace(["\r\n", "\r"], "\n", $content);
 
-                if (strlen($content) > 102400) {
+                // 8192 bytes is the max length supported by escapeshellarg.
+                if (strlen($content) > 8192) {
                     $length = mb_strlen($content, 'UTF-8');
+                    $maxI = (int) ceil($length / 2048) - 1;
 
-                    for ($pos = 0; $pos < $length; $pos += 100) {
-                        $part = mb_substr($content, $pos, 100, 'UTF-8');
+                    for ($i = 0; $i <= $maxI; $i++) {
+                        $part = mb_substr($content, $i * 2048, 2048, 'UTF-8');
                         $part = escapeshellarg($part);
 
-                        $command = 'echo ' . $part . ($pos ? ' >> ' : ' > ') . $tmpPath;
+                        $command = 'echo ' . $part . ($i ? ' >> ' : ' > ') . $tmpPath;
+
+                        if ($i === $maxI) {
+                            $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
+                            $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
+                        }
 
                         $this->executeSshCommand($ssh, $command);
                     }
-
-                    $command = "([[ ! -f $path ]] || chmod $(stat --format '%a' $path) $tmpPath)";
-                    $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
-
-                    $this->executeSshCommand($ssh, $command);
                 } else {
                     $content = escapeshellarg($content);
                     $command = 'echo ' . $content . ' > ' . $tmpPath;
-                    $command .= " && ([[ ! -f $path ]] || chmod $(stat --format '%a' $path) $tmpPath)";
+                    $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
                     $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
 
                     $this->executeSshCommand($ssh, $command);
