@@ -210,17 +210,19 @@ class BuildProvisioner extends AbstractProvisioner
 
                         $this->executeSshCommand($ssh, $command);
                     }
-                } else {
-                    $content = escapeshellarg($content);
-                    $command = 'echo ' . $content . ' > ' . $tmpPath;
-                    $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
-                    $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
 
-                    $this->executeSshCommand($ssh, $command);
+                    continue;
                 }
 
-                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
+                $content = escapeshellarg($content);
+                $command = 'echo ' . $content . ' > ' . $tmpPath;
+                $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
+                $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
+
+                $this->executeSshCommand($ssh, $command);
             }
+
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
         } catch (\Exception $ex) {
             $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
