@@ -62,15 +62,18 @@ abstract class AbstractProvisioner extends AbstractProvisionerCore
     /**
      * @param SSH2 $ssh
      * @param string $command
+     * @param int $logIndent
      *
      * @return bool|string
      *   The command output.
      */
-    protected function executeSshCommand(SSH2 $ssh, $command)
+    protected function executeSshCommand(SSH2 $ssh, string $command, int $logIndent = 2)
     {
+        $logIndent++;
+
         $this->taskLoggerService
-            ->addLogHeader($this->task, 'Executing command', 2)
-            ->addInfoLogMessage($this->task, $command, 3);
+            ->addLogHeader($this->task, 'Executing command', $logIndent - 1)
+            ->addInfoLogMessage($this->task, $command, $logIndent);
 
         $output = '';
         $result = $ssh->exec($command, function ($tmp) use ($output) {
@@ -84,16 +87,16 @@ abstract class AbstractProvisioner extends AbstractProvisionerCore
                 $type = $this->taskLoggerService::LOG_TYPE_ERROR;
             }
 
-            $this->taskLoggerService->addLogMessage($this->task, $type, $output, 3, false);
+            $this->taskLoggerService->addLogMessage($this->task, $type, $output, $logIndent, false);
         }
 
         if ($result === false) {
-            $this->taskLoggerService->addFailedLogMessage($this->task, 'Command failed.', 3);
+            $this->taskLoggerService->addFailedLogMessage($this->task, 'Command failed.', $logIndent);
 
             throw new \Exception('Could not execute command.');
         }
 
-        $this->taskLoggerService->addSuccessLogMessage($this->task, 'Command executed.', 3);
+        $this->taskLoggerService->addSuccessLogMessage($this->task, 'Command executed.', $logIndent);
 
         return $output;
     }

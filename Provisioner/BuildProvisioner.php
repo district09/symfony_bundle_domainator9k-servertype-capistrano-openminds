@@ -180,9 +180,9 @@ class BuildProvisioner extends AbstractProvisioner
                 $path .= '.' . $capistranoFile->getExtension();
                 $path = $this->templateService->replaceKeys($path, $templateEntities);
 
-                $this->taskLoggerService->addInfoLogMessage(
+                $this->taskLoggerService->addLogHeader(
                     $this->task,
-                    sprintf('Creating "%s".', $path),
+                    sprintf('Creating "%s"', $path),
                     2
                 );
 
@@ -208,7 +208,7 @@ class BuildProvisioner extends AbstractProvisioner
                             $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
                         }
 
-                        $this->executeSshCommand($ssh, $command);
+                        $this->executeSshCommand($ssh, $command, 3);
                     }
 
                     continue;
