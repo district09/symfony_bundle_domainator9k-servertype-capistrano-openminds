@@ -186,17 +186,37 @@ class BuildProvisioner extends AbstractProvisioner
                     2
                 );
 
+                $tmpPath = escapeshellarg($path . uniqid('', true) . '.tmp');
                 $path = escapeshellarg($path);
 
                 $content = $this->templateService->replaceKeys($capistranoFile->getContent(), $templateEntities);
                 $content = str_replace(["\r\n", "\r"], "\n", $content);
-                $content = escapeshellarg($content);
 
-                $command = "[[ ! -f $path ]] || MOD=$(stat --format '%a' $path && chmod 600 $path)";
-                $command .= ' && echo ' . $content . ' > ' . $path;
-                $command .= ' && [[ -z "$MOD" ]] || chmod $MOD ' . $path;
+                if (strlen($content) > 102400) {
+                    $length = mb_strlen($content, 'UTF-8');
 
-                $this->executeSshCommand($ssh, $command);
+                    for ($pos = 0; $pos < $length; $pos += 100) {
+                        $part = mb_substr($content, $pos, 100, 'UTF-8');
+                        $part = escapeshellarg($part);
+
+                        $command = 'echo ' . $part . ($pos ? ' >> ' : ' > ') . $tmpPath;
+
+                        $this->executeSshCommand($ssh, $command);
+                    }
+
+                    $command = "([[ ! -f $path ]] || chmod $(stat --format '%a' $path) $tmpPath)";
+                    $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
+
+                    $this->executeSshCommand($ssh, $command);
+                }
+                else {
+                    $content = escapeshellarg($content);
+                    $command = 'echo ' . $content . ' > ' . $tmpPath;
+                    $command .= " && ([[ ! -f $path ]] || chmod $(stat --format '%a' $path) $tmpPath)";
+                    $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
+
+                    $this->executeSshCommand($ssh, $command);
+                }
 
                 $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
             }
