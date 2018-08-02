@@ -5,12 +5,14 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entit
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Traits\IdentifiableTrait;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class CapistranoFile
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
  *
  * @ORM\Entity()
+ * @ORM\Table(name="capistrano_file")
  */
 class CapistranoFile
 {
@@ -20,35 +22,38 @@ class CapistranoFile
     /**
      * @var string
      *
-     * @ORM\Column(name="name",type="string")
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
+     * @Assert\Length(min="2", max="255")
      */
     protected $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="filename",type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $filename;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="extension",type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $extension;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="location",type="string")
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      */
     protected $location;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="content",type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $content;
 
@@ -86,7 +91,7 @@ class CapistranoFile
     /**
      * @param string $filename
      */
-    public function setFilename(string $filename)
+    public function setFilename(?string $filename)
     {
         $this->filename = $filename;
     }

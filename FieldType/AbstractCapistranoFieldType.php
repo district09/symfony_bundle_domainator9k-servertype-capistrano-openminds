@@ -44,8 +44,10 @@ abstract class AbstractCapistranoFieldType extends AbstractFieldType
         $ids = [];
 
         foreach ($value as $entity) {
-            $this->entityManager->persist($entity);
-            $ids[] = $entity->getId();
+            if ($entity) {
+                $this->entityManager->persist($entity);
+                $ids[] = $entity->getId();
+            }
         }
 
         return json_encode($ids);
@@ -99,8 +101,9 @@ abstract class AbstractCapistranoFieldType extends AbstractFieldType
         }
 
         if ($originEntity instanceof ApplicationEnvironment && is_null($originEntity->getId())) {
+
             $criteria = [
-                'type' => $originEntity->getApplication()->getApplicationType()
+                'name' => $originEntity->getApplication()->getApplicationType()
             ];
 
             $applicationType = $atRepository->findOneBy($criteria);

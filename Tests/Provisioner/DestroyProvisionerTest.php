@@ -1,20 +1,19 @@
 <?php
 
 
-namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\EventListener;
+namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Provisioner;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Environment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
-use DigipolisGent\Domainator9k\CoreBundle\Event\DestroyEvent;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\EventListener\DestroyEventListener;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\DestroyProvisioner;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Fixtures\FooApplication;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class DestroyEventistenerTest extends AbstractEventistenerTest
+class DestroyProvisionerTest extends AbstractProvisionerTest
 {
 
     public function testOnDestroy()
@@ -44,9 +43,7 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
         $task->setStatus(Task::STATUS_NEW);
         $task->setApplicationEnvironment($applicationEnvironment);
 
-        $event = new DestroyEvent($task);
-
-        $dataValueService = $this->getDataValueServiceMock(['username']);
+        $dataValueService = $this->getDataValueServiceMock([true,'username']);
         $templateService = $this->getTemplateServiceMock();
         $taskLoggerService = $this->getTaskLoggerServiceMock();
         $entityManager = $this->getEntityManagerMock();
@@ -64,14 +61,13 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             ->with($this->equalTo(VirtualServer::class))
             ->willReturn($serverRepository);
 
-        $taskLoggerService
-            ->expects($this->at(0))
-            ->method('addLine');
-
         $arguments = [$dataValueService, $templateService, $taskLoggerService, $entityManager];
         $methods = [
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
+            },
+            'removeFiles' => function () {
+                return null;
             },
             'removeSymlinks' => function () {
                 return null;
@@ -84,8 +80,9 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             }
         ];
 
-        $eventListener = $this->getEventListenerMock($arguments, $methods);
-        $eventListener->onDestroy($event);
+        $provisioner = $this->getProvisionerMock($arguments, $methods);
+        $provisioner->setTask($task);
+        $provisioner->run();
     }
 
 
@@ -111,22 +108,22 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             ->method('replaceKeys')
             ->willReturn('/path/to/my/source');
 
-        $eventListener = new DestroyEventListener(
+        $provisioner = new DestroyProvisioner(
             $dataValueService,
             $templateService,
             $taskLoggerService,
             $entityManager
         );
 
+        $source = escapeshellarg('/path/to/my/source');
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo('rm /path/to/my/source'));
-
+            ->with($this->equalTo('rm ' . $source));
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $eventListener->removeSymlinks($ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'removeSymlinks', $ssh, $applicationEnvironment);
     }
 
     public function testRemoveFolders()
@@ -151,28 +148,29 @@ class DestroyEventistenerTest extends AbstractEventistenerTest
             ->method('replaceKeys')
             ->willReturn('/path/to/my/location');
 
-        $eventListener = new DestroyEventListener(
+        $provisioner = new DestroyProvisioner(
             $dataValueService,
             $templateService,
             $taskLoggerService,
             $entityManager
         );
 
+        $path = escapeshellarg('/path/to/my/location');
         $ssh = $this->getSsh2Mock();
         $ssh->expects($this->at(0))
             ->method('exec')
-            ->with($this->equalTo('rm -rf /path/to/my/location'));
+            ->with($this->equalTo('rm -rf ' . $path));
 
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $eventListener->removeFolders($ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'removeFolders', $ssh, $applicationEnvironment);
     }
 
-    private function getEventListenerMock(array $arguments, array $methods)
+    private function getProvisionerMock(array $arguments, array $methods)
     {
         $mock = $this
-            ->getMockBuilder(DestroyEventListener::class)
+            ->getMockBuilder(DestroyProvisioner::class)
             ->setMethods(array_keys($methods))
             ->setConstructorArgs($arguments)
             ->getMock();

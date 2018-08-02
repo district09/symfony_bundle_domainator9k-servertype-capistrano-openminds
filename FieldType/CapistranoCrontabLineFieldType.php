@@ -3,16 +3,15 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType;
 
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoSymlinkFormType;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoCrontabLine;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoCrontabLineFormType;
 
 /**
- * Class CapistranoSymlinkFieldType
+ * Class CapistranoCrontabLineFieldType
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType
  */
-class CapistranoSymlinkFieldType extends AbstractCapistranoFieldType
+class CapistranoCrontabLineFieldType extends AbstractCapistranoFieldType
 {
-
     /**
      * @param $value
      * @return array
@@ -20,9 +19,9 @@ class CapistranoSymlinkFieldType extends AbstractCapistranoFieldType
     public function getOptions($value): array
     {
         return $this->getCapistranoOptions(
-            CapistranoSymlinkFormType::class,
-            CapistranoSymlink::class,
-            'capistrano_symlink',
+            CapistranoCrontabLineFormType::class,
+            CapistranoCrontabLine::class,
+            'capistrano_crontab_line',
             $value
         );
     }
@@ -32,7 +31,7 @@ class CapistranoSymlinkFieldType extends AbstractCapistranoFieldType
      */
     public static function getName(): string
     {
-        return 'capistrano_symlink';
+        return 'capistrano_crontab_line';
     }
 
     /**
@@ -50,6 +49,6 @@ class CapistranoSymlinkFieldType extends AbstractCapistranoFieldType
      */
     public function decodeValue($value)
     {
-        return $this->decodeCapistranoValue(CapistranoSymlink::class, $value);
+        return $this->decodeCapistranoValue(CapistranoCrontabLine::class, $value);
     }
 }

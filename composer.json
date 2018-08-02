@@ -11,7 +11,7 @@
     "php": ">=7.1",
     "symfony/symfony": ">=3.4",
     "doctrine/orm": "^2.5",
-    "digipolisgent/domainator9k-core-bundle": "^1.0.0-alpha2",
+    "digipolisgent/domainator9k-core-bundle": "^1.0.0",
     "guzzlehttp/guzzle": "^6.3"
   },
   "require-dev": {
