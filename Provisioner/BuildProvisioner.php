@@ -208,8 +208,7 @@ class BuildProvisioner extends AbstractProvisioner
                     $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
 
                     $this->executeSshCommand($ssh, $command);
-                }
-                else {
+                } else {
                     $content = escapeshellarg($content);
                     $command = 'echo ' . $content . ' > ' . $tmpPath;
                     $command .= " && ([[ ! -f $path ]] || chmod $(stat --format '%a' $path) $tmpPath)";
