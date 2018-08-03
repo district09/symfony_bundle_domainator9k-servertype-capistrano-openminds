@@ -172,59 +172,6 @@ class BuildProvisionerTest extends AbstractProvisionerTest
         $this->invokeProvisionerMethod($provisioner, 'createSymlinks', $ssh, $applicationEnvironment);
     }
 
-    public function testCreateFiles()
-    {
-        $dataValueService = $this->getDataValueServiceMock([]);
-        $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
-        $entityManager = $this->getEntityManagerMock();
-
-        $files = new ArrayCollection();
-        $file = new CapistranoFile();
-        $file->setLocation('/path/to/location');
-        $file->setFilename('file');
-        $file->setExtension('ext');
-        $file->setContent('my content');
-        $files->add($file);
-
-        $dataValueService
-            ->expects($this->at(0))
-            ->method('getValue')
-            ->willReturn($files);
-
-        $templateService
-            ->expects($this->at(0))
-            ->method('replaceKeys')
-            ->willReturn('/path/to/location/file.ext');
-
-        $templateService
-            ->expects($this->at(1))
-            ->method('replaceKeys')
-            ->willReturn('my-content');
-
-        $provisioner = new BuildProvisioner(
-            $dataValueService,
-            $templateService,
-            $taskLoggerService,
-            $entityManager
-        );
-
-        $path = escapeshellarg('/path/to/location/file.ext');
-        $content = escapeshellarg('my-content');
-        $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
-            ->method('exec')
-            ->with($this->equalTo(
-                "[[ ! -f $path ]] || MOD=$(stat --format '%a' $path "
-              . "&& chmod 600 $path) "
-              . "&& echo $content > $path "
-              . "&& [[ -z \"\$MOD\" ]] || chmod \$MOD $path"));
-
-        $applicationEnvironment = new ApplicationEnvironment();
-
-        $this->invokeProvisionerMethod($provisioner, 'createFiles', $ssh, $applicationEnvironment);
-    }
-
     private function getProvisionerMock(array $arguments, array $methods)
     {
         $mock = $this
