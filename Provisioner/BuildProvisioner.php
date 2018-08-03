@@ -180,26 +180,49 @@ class BuildProvisioner extends AbstractProvisioner
                 $path .= '.' . $capistranoFile->getExtension();
                 $path = $this->templateService->replaceKeys($path, $templateEntities);
 
-                $this->taskLoggerService->addInfoLogMessage(
+                $this->taskLoggerService->addLogHeader(
                     $this->task,
-                    sprintf('Creating "%s".', $path),
+                    sprintf('Creating "%s"', $path),
                     2
                 );
 
+                $tmpPath = escapeshellarg($path . uniqid('.', true) . '.tmp');
                 $path = escapeshellarg($path);
 
                 $content = $this->templateService->replaceKeys($capistranoFile->getContent(), $templateEntities);
                 $content = str_replace(["\r\n", "\r"], "\n", $content);
-                $content = escapeshellarg($content);
 
-                $command = "[[ ! -f $path ]] || MOD=$(stat --format '%a' $path && chmod 600 $path)";
-                $command .= ' && echo ' . $content . ' > ' . $path;
-                $command .= ' && [[ -z "$MOD" ]] || chmod $MOD ' . $path;
+                // 8192 bytes is the max length supported by escapeshellarg.
+                if (strlen($content) > 8192) {
+                    $length = mb_strlen($content, 'UTF-8');
+                    $maxI = (int) ceil($length / 2048) - 1;
+
+                    for ($i = 0; $i <= $maxI; $i++) {
+                        $part = mb_substr($content, $i * 2048, 2048, 'UTF-8');
+                        $part = escapeshellarg($part);
+
+                        $command = 'echo ' . $part . ($i ? ' >> ' : ' > ') . $tmpPath;
+
+                        if ($i === $maxI) {
+                            $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
+                            $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
+                        }
+
+                        $this->executeSshCommand($ssh, $command, 3);
+                    }
+
+                    continue;
+                }
+
+                $content = escapeshellarg($content);
+                $command = 'echo ' . $content . ' > ' . $tmpPath;
+                $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
+                $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
 
                 $this->executeSshCommand($ssh, $command);
-
-                $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
             }
+
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
         } catch (\Exception $ex) {
             $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
