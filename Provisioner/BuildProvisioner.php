@@ -89,10 +89,10 @@ class BuildProvisioner extends AbstractProvisioner
                     2
                 );
 
-                $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . escapeshellarg($path));
+                $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . escapeshellarg($path), 3);
             }
 
-            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories created.', 2);
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories created.');
         } catch (\Exception $ex) {
             $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
@@ -201,7 +201,7 @@ class BuildProvisioner extends AbstractProvisioner
                         $part = mb_substr($content, $i * 2048, 2048, 'UTF-8');
                         $part = escapeshellarg($part);
 
-                        $command = 'echo ' . $part . ($i ? ' >> ' : ' > ') . $tmpPath;
+                        $command = 'echo -n ' . $part . ($i ? ' >> ' : ' > ') . $tmpPath;
 
                         if ($i === $maxI) {
                             $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
@@ -215,11 +215,11 @@ class BuildProvisioner extends AbstractProvisioner
                 }
 
                 $content = escapeshellarg($content);
-                $command = 'echo ' . $content . ' > ' . $tmpPath;
+                $command = 'echo -n ' . $content . ' > ' . $tmpPath;
                 $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
                 $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
 
-                $this->executeSshCommand($ssh, $command);
+                $this->executeSshCommand($ssh, $command, 3);
             }
 
             $this->taskLoggerService->addSuccessLogMessage($this->task, 'Files created.', 2);
