@@ -83,7 +83,7 @@ class BuildProvisioner extends AbstractProvisioner
             foreach ($capistranoFolders as $capistranoFolder) {
                 $path = $this->templateService->replaceKeys($capistranoFolder->getLocation(), $templateEntities);
 
-                $this->taskLoggerService->addInfoLogMessage(
+                $this->taskLoggerService->addLogHeader(
                     $this->task,
                     sprintf('Creating "%s".', $path),
                     2
@@ -92,7 +92,7 @@ class BuildProvisioner extends AbstractProvisioner
                 $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . escapeshellarg($path), 3);
             }
 
-            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories created.');
+            $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories created.', 2);
         } catch (\Exception $ex) {
             $this->taskLoggerService
                 ->addErrorLogMessage($this->task, $ex->getMessage(), 2)
@@ -133,7 +133,7 @@ class BuildProvisioner extends AbstractProvisioner
                     $templateEntities
                 );
 
-                $this->taskLoggerService->addInfoLogMessage(
+                $this->taskLoggerService->addLogHeader(
                     $this->task,
                     sprintf('Symlinking "%s" to "%s".', $source, $destination),
                     2
@@ -141,7 +141,7 @@ class BuildProvisioner extends AbstractProvisioner
 
                 $command = 'ln -sfn ' . escapeshellarg($destination) . ' ' . escapeshellarg($source);
 
-                $this->executeSshCommand($ssh, $command);
+                $this->executeSshCommand($ssh, $command, 3);
             }
 
             $this->taskLoggerService->addSuccessLogMessage($this->task, 'Symlinks created.', 2);
@@ -201,7 +201,7 @@ class BuildProvisioner extends AbstractProvisioner
                         $part = mb_substr($content, $i * 2048, 2048, 'UTF-8');
                         $part = escapeshellarg($part);
 
-                        $command = 'echo -n ' . $part . ($i ? ' >> ' : ' > ') . $tmpPath;
+                        $command = 'echo ' . ($i === $maxI ? '' : '-n ') . $part . ($i ? ' >> ' : ' > ') . $tmpPath;
 
                         if ($i === $maxI) {
                             $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
@@ -215,7 +215,7 @@ class BuildProvisioner extends AbstractProvisioner
                 }
 
                 $content = escapeshellarg($content);
-                $command = 'echo -n ' . $content . ' > ' . $tmpPath;
+                $command = 'echo ' . $content . ' > ' . $tmpPath;
                 $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
                 $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
 
