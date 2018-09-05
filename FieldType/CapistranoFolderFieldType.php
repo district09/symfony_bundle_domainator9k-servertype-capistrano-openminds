@@ -1,6 +1,5 @@
 <?php
 
-
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType;
 
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
@@ -12,7 +11,6 @@ use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\C
  */
 class CapistranoFolderFieldType extends AbstractCapistranoFieldType
 {
-
     /**
      * @param $value
      * @return array

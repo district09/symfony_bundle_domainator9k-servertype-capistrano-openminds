@@ -1,6 +1,5 @@
 <?php
 
-
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\FieldType;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
@@ -14,7 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 abstract class AbstractCapistranoFieldType extends AbstractFieldType
 {
-
     protected $entityManager;
 
     /**

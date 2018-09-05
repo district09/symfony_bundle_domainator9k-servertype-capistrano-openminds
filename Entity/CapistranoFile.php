@@ -4,6 +4,7 @@
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\Traits\IdentifiableTrait;
+use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Validator\Constraints as CapistranoAssert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -32,6 +33,7 @@ class CapistranoFile
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\NotBlank()
      */
     protected $filename;
 
@@ -39,6 +41,7 @@ class CapistranoFile
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\NotBlank()
      */
     protected $extension;
 
@@ -49,6 +52,15 @@ class CapistranoFile
      * @Assert\NotBlank()
      */
     protected $location;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="chmod",type="smallint",options={"unsigned":true, "default":644})
+     * @Assert\NotBlank()
+     * @CapistranoAssert\ChmodMode()
+     */
+    protected $chmod = 644;
 
     /**
      * @var string
@@ -126,6 +138,22 @@ class CapistranoFile
     public function setLocation(string $location)
     {
         $this->location = $location;
+    }
+
+    /**
+     * @return int
+     */
+    public function getChmod()
+    {
+        return $this->chmod;
+    }
+
+    /**
+     * @param int $chmod
+     */
+    public function setChmod($chmod)
+    {
+        $this->chmod = (int) $chmod;
     }
 
     /**
