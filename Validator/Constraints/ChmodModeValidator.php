@@ -11,7 +11,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ChmodModeValidator extends ConstraintValidator
 {
-
     /**
      * {@inheritdoc}
      */
@@ -35,11 +34,12 @@ class ChmodModeValidator extends ConstraintValidator
                 if ($property === 'special' && $constraint->special < 1) {
                     $regex .= '?';
                 }
+
+                continue;
             }
-            else {
-                $regex .= '[0-7]';
-                $violationPattern .= 'x';
-            }
+
+            $regex .= '[0-7]';
+            $violationPattern .= 'x';
         }
 
         if (!preg_match('/^' . $regex . '$/', $value)) {
@@ -54,5 +54,4 @@ class ChmodModeValidator extends ConstraintValidator
                 ->addViolation();
         }
     }
-
 }

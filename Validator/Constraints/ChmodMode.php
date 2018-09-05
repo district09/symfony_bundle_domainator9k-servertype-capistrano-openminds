@@ -20,5 +20,4 @@ class ChmodMode extends Constraint
     public $message = '"{{ mode }}" is not a valid chmod mode.';
 
     public $patternMessage = '"{{ mode }}" Is not a valid chmod mode or does not match the required pattern "{{ pattern }}".';
-
 }
