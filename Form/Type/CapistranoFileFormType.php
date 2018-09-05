@@ -25,6 +25,7 @@ class CapistranoFileFormType extends AbstractType
         $builder->add('filename');
         $builder->add('extension');
         $builder->add('location');
+        $builder->add('chmod');
         $builder->add('content');
     }
 
