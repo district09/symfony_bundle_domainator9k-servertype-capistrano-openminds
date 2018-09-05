@@ -89,7 +89,9 @@ class BuildProvisioner extends AbstractProvisioner
                     2
                 );
 
-                $this->executeSshCommand($ssh, 'mkdir -p -m 750 ' . escapeshellarg($path), 3);
+                $path = escapeshellarg($path);
+                $cmd = 'mkdir -p ' . $path . ' && chmod ' . $capistranoFolder->getChmod() . ' ' . $path;
+                $this->executeSshCommand($ssh, $cmd, 3);
             }
 
             $this->taskLoggerService->addSuccessLogMessage($this->task, 'Directories created.', 2);
@@ -204,7 +206,7 @@ class BuildProvisioner extends AbstractProvisioner
                         $command = 'echo ' . ($i === $maxI ? '' : '-n ') . $part . ($i ? ' >> ' : ' > ') . $tmpPath;
 
                         if ($i === $maxI) {
-                            $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
+                            $command .= ' && chmod ' . $capistranoFile->getChmod() . ' ' . $tmpPath;
                             $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
                         }
 
@@ -216,7 +218,7 @@ class BuildProvisioner extends AbstractProvisioner
 
                 $content = escapeshellarg($content);
                 $command = 'echo ' . $content . ' > ' . $tmpPath;
-                $command .= " && ([[ ! -f $path ]] || chmod \$(stat --format '%a' $path) $tmpPath)";
+                $command .= ' && chmod ' . $capistranoFile->getChmod() . ' ' . $tmpPath;
                 $command .= ' && mv -f ' . $tmpPath . ' ' . $path;
 
                 $this->executeSshCommand($ssh, $command, 3);

@@ -23,6 +23,7 @@ class CapistranoFolderFormType extends AbstractType
         parent::buildForm($builder, $options);
         $builder->add('name');
         $builder->add('location');
+        $builder->add('chmod');
     }
 
     /**
