@@ -13,7 +13,7 @@ use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Fixtures\FooApplication;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class DestroyProvisionerTest extends AbstractProvisionerTest
+abstract class AbstractDestroyProvisionerTest extends AbstractProvisionerTest
 {
 
     public function testOnDestroy()
@@ -66,18 +66,9 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
             },
-            'removeFiles' => function () {
+            'deRemove' => function () {
                 return null;
             },
-            'removeSymlinks' => function () {
-                return null;
-            },
-            'removeFolders' => function () {
-                return null;
-            },
-            'createFiles' => function () {
-                return null;
-            }
         ];
 
         $provisioner = $this->getProvisionerMock($arguments, $methods);
@@ -85,92 +76,10 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
         $provisioner->run();
     }
 
-
-    public function testRemoveSymlinks()
-    {
-        $dataValueService = $this->getDataValueServiceMock([]);
-        $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
-        $entityManager = $this->getEntityManagerMock();
-
-        $symlinks = new ArrayCollection();
-        $symlink = new CapistranoSymlink();
-        $symlink->setSourceLocation('/path/to/my/source');
-        $symlinks->add($symlink);
-
-        $dataValueService
-            ->expects($this->at(0))
-            ->method('getValue')
-            ->willReturn($symlinks);
-
-        $templateService
-            ->expects($this->at(0))
-            ->method('replaceKeys')
-            ->willReturn('/path/to/my/source');
-
-        $provisioner = new DestroyProvisioner(
-            $dataValueService,
-            $templateService,
-            $taskLoggerService,
-            $entityManager
-        );
-
-        $source = escapeshellarg('/path/to/my/source');
-        $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
-            ->method('exec')
-            ->with($this->equalTo('rm ' . $source));
-
-        $applicationEnvironment = new ApplicationEnvironment();
-
-        $this->invokeProvisionerMethod($provisioner, 'removeSymlinks', $ssh, $applicationEnvironment);
-    }
-
-    public function testRemoveFolders()
-    {
-        $dataValueService = $this->getDataValueServiceMock([]);
-        $templateService = $this->getTemplateServiceMock();
-        $taskLoggerService = $this->getTaskLoggerServiceMock();
-        $entityManager = $this->getEntityManagerMock();
-
-        $folders = new ArrayCollection();
-        $folder = new CapistranoFolder();
-        $folder->setLocation('/path/to/my/location');
-        $folders->add($folder);
-
-        $dataValueService
-            ->expects($this->at(0))
-            ->method('getValue')
-            ->willReturn($folders);
-
-        $templateService
-            ->expects($this->at(0))
-            ->method('replaceKeys')
-            ->willReturn('/path/to/my/location');
-
-        $provisioner = new DestroyProvisioner(
-            $dataValueService,
-            $templateService,
-            $taskLoggerService,
-            $entityManager
-        );
-
-        $path = escapeshellarg('/path/to/my/location');
-        $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
-            ->method('exec')
-            ->with($this->equalTo('rm -rf ' . $path));
-
-
-        $applicationEnvironment = new ApplicationEnvironment();
-
-        $this->invokeProvisionerMethod($provisioner, 'removeFolders', $ssh, $applicationEnvironment);
-    }
-
-    private function getProvisionerMock(array $arguments, array $methods)
+    protected function getProvisionerMock(array $arguments, array $methods)
     {
         $mock = $this
-            ->getMockBuilder(DestroyProvisioner::class)
+            ->getMockBuilder($this->getProvisionerClass())
             ->setMethods(array_keys($methods))
             ->setConstructorArgs($arguments)
             ->getMock();
@@ -183,4 +92,6 @@ class DestroyProvisionerTest extends AbstractProvisionerTest
 
         return $mock;
     }
+
+    abstract protected function getProvisionerClass();
 }

@@ -16,9 +16,27 @@ services:
     DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provider\DataTypeProvider:
         tags:
             - { name: data_type_provider }
-    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\BuildProvisioner:
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\BuildCrontabProvisioner:
+        tags:
+            - { name: domainator.provisioner.build, priority: 27 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\BuildSymlinkProvisioner:
+        tags:
+            - { name: domainator.provisioner.build, priority: 28 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\BuildFileProvisioner:
+        tags:
+            - { name: domainator.provisioner.build, priority: 29 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\BuildFolderProvisioner:
         tags:
             - { name: domainator.provisioner.build, priority: 30 }
-    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\DestroyProvisioner:
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\DestroyFolderProvisioner:
+        tags:
+           - { name: domainator.provisioner.destroy, priority: 37 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\DestroyFileProvisioner:
+        tags:
+           - { name: domainator.provisioner.destroy, priority: 38 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\DestroyCrontabProvisioner:
+        tags:
+           - { name: domainator.provisioner.destroy, priority: 39 }
+    DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner\DestroySymlinkProvisioner:
         tags:
            - { name: domainator.provisioner.destroy, priority: 40 }
