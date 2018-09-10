@@ -18,19 +18,19 @@ class BuildFolderProvisioner extends AbstractBuildProvisioner
         return 'Capistrano folders';
     }
 
-    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating directories', 1);
 
-        if (!$capistranoFolders = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_folder')) {
+        if (!$capistranoFolders = $this->dataValueService->getValue($appEnv, 'capistrano_folder')) {
             $this->taskLoggerService->addInfoLogMessage($this->task, 'No directories specified.', 2);
             return;
         }
 
         $templateEntities = [
-            'application_environment' => $applicationEnvironment,
-            'application' => $applicationEnvironment->getApplication(),
-            'environment' => $applicationEnvironment->getEnvironment(),
+            'application_environment' => $appEnv,
+            'application' => $appEnv->getApplication(),
+            'environment' => $appEnv->getEnvironment(),
         ];
 
         try {
@@ -42,7 +42,8 @@ class BuildFolderProvisioner extends AbstractBuildProvisioner
                     sprintf('Creating "%s".', $path),
                     2
                 );
-                $cmd = 'mkdir -p ' . escapeshellarg($path) . ' && chmod ' . $capistranoFolder->getChmod() . ' ' . escapeshellarg($path);
+                $cmd = 'mkdir -p ' . escapeshellarg($path)
+                    . ' && chmod ' . $capistranoFolder->getChmod() . ' ' . escapeshellarg($path);
                 $this->executeSshCommand($ssh, $cmd, 3);
             }
 
@@ -55,5 +56,4 @@ class BuildFolderProvisioner extends AbstractBuildProvisioner
             throw $ex;
         }
     }
-
 }

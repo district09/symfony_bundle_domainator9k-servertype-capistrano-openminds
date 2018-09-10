@@ -19,8 +19,8 @@ abstract class AbstractBuildProvisioner extends AbstractProvisioner
 
     public function doRun()
     {
-        $applicationEnvironment = $this->task->getApplicationEnvironment();
-        $environment = $applicationEnvironment->getEnvironment();
+        $appEnv = $this->task->getApplicationEnvironment();
+        $environment = $appEnv->getEnvironment();
 
         /** @var VirtualServer[] $servers */
         $servers = $this->entityManager->getRepository(VirtualServer::class)->findAll();
@@ -40,10 +40,10 @@ abstract class AbstractBuildProvisioner extends AbstractProvisioner
             );
 
             try {
-                $user = $this->dataValueService->getValue($applicationEnvironment, 'sock_ssh_user');
+                $user = $this->dataValueService->getValue($appEnv, 'sock_ssh_user');
                 $ssh = $this->getSshCommand($server, $user);
 
-                $this->doCreate($ssh, $applicationEnvironment);
+                $this->doCreate($ssh, $appEnv);
 
                 $this->taskLoggerService->addSuccessLogMessage($this->task, 'Server provisioned.');
             } catch (\Exception $ex) {
@@ -59,7 +59,7 @@ abstract class AbstractBuildProvisioner extends AbstractProvisioner
 
     /**
      * @param SSH2 $ssh
-     * @param ApplicationEnvironment $applicationEnvironment
+     * @param ApplicationEnvironment $appEnv
      */
-    abstract protected function doCreate(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment);
+    abstract protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv);
 }

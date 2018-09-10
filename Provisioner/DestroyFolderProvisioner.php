@@ -18,18 +18,18 @@ class DestroyFolderProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano folders';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing directories', 1);
 
-        if (!$capistranoFolders = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_folder')) {
+        if (!$capistranoFolders = $this->dataValueService->getValue($appEnv, 'capistrano_folder')) {
             $this->taskLoggerService->addInfoLogMessage($this->task, 'No directories present.', 2);
             return;
         }
 
         $templateEntities = [
-            'application_environment' => $applicationEnvironment,
-            'application' => $applicationEnvironment->getApplication(),
+            'application_environment' => $appEnv,
+            'application' => $appEnv->getApplication(),
         ];
 
         try {

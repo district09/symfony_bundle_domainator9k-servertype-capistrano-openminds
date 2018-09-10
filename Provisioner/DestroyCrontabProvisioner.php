@@ -18,19 +18,19 @@ class DestroyCrontabProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano crontab';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing crontab', 1);
 
-        if (!$this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line')) {
+        if (!$this->dataValueService->getValue($appEnv, 'capistrano_crontab_line')) {
             $this->taskLoggerService->addInfoLogMessage($this->task, 'No crontab present.', 2);
             return;
         }
 
         // Get the application specific string to wrap arround the crontab lines.
         $wrapper = '### DOMAINATOR:';
-        $wrapper .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
-        $wrapper .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+        $wrapper .= $appEnv->getApplication()->getNameCanonical() . ':';
+        $wrapper .= $appEnv->getEnvironment()->getName() . ' ###';
 
         // Build the command to strip the current crontab lines.
         $command = 'crontab -l | ';

@@ -18,19 +18,19 @@ class BuildSymlinkProvisioner extends AbstractBuildProvisioner
         return 'Capistrano symlinks';
     }
 
-    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating symlinks', 1);
 
-        if (!$capistranoSymlinks = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_symlink')) {
+        if (!$capistranoSymlinks = $this->dataValueService->getValue($appEnv, 'capistrano_symlink')) {
             $this->taskLoggerService->addInfoLogMessage($this->task, 'No symlinks specified.', 2);
             return;
         }
 
         $templateEntities = [
-            'application_environment' => $applicationEnvironment,
-            'application' => $applicationEnvironment->getApplication(),
-            'environment' => $applicationEnvironment->getEnvironment(),
+            'application_environment' => $appEnv,
+            'application' => $appEnv->getApplication(),
+            'environment' => $appEnv->getEnvironment(),
         ];
 
         try {
@@ -65,5 +65,4 @@ class BuildSymlinkProvisioner extends AbstractBuildProvisioner
             throw $ex;
         }
     }
-
 }

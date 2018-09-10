@@ -18,18 +18,18 @@ class DestroyFileProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano files';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing files', 1);
 
-        if (!$capistranoFiles = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_file')) {
+        if (!$capistranoFiles = $this->dataValueService->getValue($appEnv, 'capistrano_file')) {
             $this->taskLoggerService->addInfoLogMessage($this->task, 'No files present.', 2);
             return;
         }
 
         $templateEntities = [
-            'application_environment' => $applicationEnvironment,
-            'application' => $applicationEnvironment->getApplication(),
+            'application_environment' => $appEnv,
+            'application' => $appEnv->getApplication(),
         ];
 
         try {

@@ -18,19 +18,19 @@ class BuildFileProvisioner extends AbstractBuildProvisioner
         return 'Capistrano files';
     }
 
-    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating files', 1);
 
-        if (!$capistranoFiles = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_file')) {
+        if (!$capistranoFiles = $this->dataValueService->getValue($appEnv, 'capistrano_file')) {
             $this->taskLoggerService->addInfoLogMessage($this->task, 'No files specified.', 2);
             return;
         }
 
         $templateEntities = [
-            'application_environment' => $applicationEnvironment,
-            'application' => $applicationEnvironment->getApplication(),
-            'environment' => $applicationEnvironment->getEnvironment(),
+            'application_environment' => $appEnv,
+            'application' => $appEnv->getApplication(),
+            'environment' => $appEnv->getEnvironment(),
         ];
 
         try {
@@ -91,5 +91,4 @@ class BuildFileProvisioner extends AbstractBuildProvisioner
             throw $ex;
         }
     }
-
 }

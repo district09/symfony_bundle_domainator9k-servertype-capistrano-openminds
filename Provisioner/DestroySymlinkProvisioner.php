@@ -18,18 +18,18 @@ class DestroySymlinkProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano symlinks';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment)
+    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing symlinks', 1);
 
-        if (!$capistranoSymlinks = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_symlink')) {
+        if (!$capistranoSymlinks = $this->dataValueService->getValue($appEnv, 'capistrano_symlink')) {
             $this->taskLoggerService->addInfoLogMessage($this->task, 'No symlinks present.', 2);
             return;
         }
 
         $templateEntities = [
-            'application_environment' => $applicationEnvironment,
-            'application' => $applicationEnvironment->getApplication(),
+            'application_environment' => $appEnv,
+            'application' => $appEnv->getApplication(),
         ];
 
         try {

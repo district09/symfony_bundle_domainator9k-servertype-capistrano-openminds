@@ -18,19 +18,20 @@ class BuildCrontabProvisioner extends AbstractBuildProvisioner
         return 'Capistrano crontab';
     }
 
-    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $applicationEnvironment) {
+    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating crontab', 1);
 
         $templateEntities = [
-            'application_environment' => $applicationEnvironment,
-            'application' => $applicationEnvironment->getApplication(),
-            'environment' => $applicationEnvironment->getEnvironment(),
+            'application_environment' => $appEnv,
+            'application' => $appEnv->getApplication(),
+            'environment' => $appEnv->getEnvironment(),
         ];
 
         // Get the application specific string to wrap arround the crontab lines.
         $wrapper = '### DOMAINATOR:';
-        $wrapper .= $applicationEnvironment->getApplication()->getNameCanonical() . ':';
-        $wrapper .= $applicationEnvironment->getEnvironment()->getName() . ' ###';
+        $wrapper .= $appEnv->getApplication()->getNameCanonical() . ':';
+        $wrapper .= $appEnv->getEnvironment()->getName() . ' ###';
 
         // Build the command to strip the current crontab lines.
         $command = 'crontab -l | ';
@@ -40,10 +41,10 @@ class BuildCrontabProvisioner extends AbstractBuildProvisioner
         $command .= 'tr -s \'\r\' \'\n\'';
 
         // Get the crontab lines.
-        $crontabLines = $this->dataValueService->getValue($applicationEnvironment, 'capistrano_crontab_line');
+        $crontabLines = $this->dataValueService->getValue($appEnv, 'capistrano_crontab_line');
 
         try {
-            if (!$crontabLines || $ssh->host !== $applicationEnvironment->getWorkerServerIp()) {
+            if (!$crontabLines || $ssh->host !== $appEnv->getWorkerServerIp()) {
                 // Remove the crontab lines.
                 $command = '(' . $command . ') | crontab -';
 
@@ -78,5 +79,4 @@ class BuildCrontabProvisioner extends AbstractBuildProvisioner
             throw $ex;
         }
     }
-
 }
