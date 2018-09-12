@@ -18,7 +18,7 @@ class DestroyFolderProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano folders';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doDestroy(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing directories', 1);
 

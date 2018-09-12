@@ -18,7 +18,7 @@ class DestroyFileProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano files';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doDestroy(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing files', 1);
 

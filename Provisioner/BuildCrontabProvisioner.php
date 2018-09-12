@@ -18,7 +18,7 @@ class BuildCrontabProvisioner extends AbstractBuildProvisioner
         return 'Capistrano crontab';
     }
 
-    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doBuild(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating crontab', 1);
 

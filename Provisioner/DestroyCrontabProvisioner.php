@@ -18,7 +18,7 @@ class DestroyCrontabProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano crontab';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doDestroy(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing crontab', 1);
 

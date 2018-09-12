@@ -18,7 +18,7 @@ class BuildFolderProvisioner extends AbstractBuildProvisioner
         return 'Capistrano folders';
     }
 
-    protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doBuild(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating directories', 1);
 

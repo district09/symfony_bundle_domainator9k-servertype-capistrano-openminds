@@ -18,7 +18,7 @@ class DestroySymlinkProvisioner extends AbstractDestroyProvisioner
         return 'Capistrano symlinks';
     }
 
-    protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doDestroy(SSH2 $ssh, ApplicationEnvironment $appEnv)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Removing symlinks', 1);
 

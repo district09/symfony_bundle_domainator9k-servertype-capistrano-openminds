@@ -43,7 +43,7 @@ abstract class AbstractBuildProvisioner extends AbstractProvisioner
                 $user = $this->dataValueService->getValue($appEnv, 'sock_ssh_user');
                 $ssh = $this->getSshCommand($server, $user);
 
-                $this->doCreate($ssh, $appEnv);
+                $this->doBuild($ssh, $appEnv);
 
                 $this->taskLoggerService->addSuccessLogMessage($this->task, 'Server provisioned.');
             } catch (\Exception $ex) {
@@ -61,5 +61,5 @@ abstract class AbstractBuildProvisioner extends AbstractProvisioner
      * @param SSH2 $ssh
      * @param ApplicationEnvironment $appEnv
      */
-    abstract protected function doCreate(SSH2 $ssh, ApplicationEnvironment $appEnv);
+    abstract protected function doBuild(SSH2 $ssh, ApplicationEnvironment $appEnv);
 }

@@ -41,7 +41,7 @@ abstract class AbstractDestroyProvisioner extends AbstractProvisioner
                 $user = $this->dataValueService->getValue($appEnv, 'sock_ssh_user');
                 $ssh = $this->getSshCommand($server, $user);
 
-                $this->doRemove($ssh, $appEnv);
+                $this->doDestroy($ssh, $appEnv);
 
                 $this->taskLoggerService->addSuccessLogMessage($this->task, 'Server cleaned.');
             } catch (\Exception $ex) {
@@ -59,5 +59,5 @@ abstract class AbstractDestroyProvisioner extends AbstractProvisioner
      * @param SSH2 $ssh
      * @param ApplicationEnvironment $appEnv
      */
-    abstract protected function doRemove(SSH2 $ssh, ApplicationEnvironment $appEnv);
+    abstract protected function doDestroy(SSH2 $ssh, ApplicationEnvironment $appEnv);
 }
