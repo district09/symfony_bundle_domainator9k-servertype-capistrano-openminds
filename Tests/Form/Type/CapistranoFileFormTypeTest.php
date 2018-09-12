@@ -18,6 +18,7 @@ class CapistranoFileFormTypeTest extends AbstractFormTypeTest
             'filename',
             'extension',
             'location',
+            'chmod',
             'content',
         ];
 
