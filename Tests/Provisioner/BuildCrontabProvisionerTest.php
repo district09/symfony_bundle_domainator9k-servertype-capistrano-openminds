@@ -61,7 +61,7 @@ class BuildCrontabProvisionerTest extends AbstractBuildProvisionerTest
         $env->addVirtualServer($server);
         $applicationEnvironment->setEnvironment($env);
 
-        $this->invokeProvisionerMethod($provisioner, 'doCreate', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment);
     }
 
     protected function getProvisionerClass()

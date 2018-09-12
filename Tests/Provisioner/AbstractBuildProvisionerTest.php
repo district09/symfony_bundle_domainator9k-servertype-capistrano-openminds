@@ -63,7 +63,7 @@ abstract class AbstractBuildProvisionerTest extends AbstractProvisionerTest
             'getSshCommand' => function () {
                 return $this->getSsh2Mock();
             },
-            'doCreate' => function () {
+            'doBuild' => function () {
                 return null;
             },
         ];

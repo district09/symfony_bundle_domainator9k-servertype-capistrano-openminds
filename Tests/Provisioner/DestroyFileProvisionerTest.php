@@ -53,7 +53,7 @@ class DestroyFileProvisionerTest extends AbstractDestroyProvisionerTest
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $this->invokeProvisionerMethod($provisioner, 'doRemove', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doDestroy', $ssh, $applicationEnvironment);
     }
 
     protected function getProvisionerClass()

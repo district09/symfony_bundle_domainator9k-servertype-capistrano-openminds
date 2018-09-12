@@ -50,7 +50,7 @@ class BuildFolderProvisionerTest extends AbstractBuildProvisionerTest
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $this->invokeProvisionerMethod($provisioner, 'doCreate', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment);
     }
 
     protected function getProvisionerClass()

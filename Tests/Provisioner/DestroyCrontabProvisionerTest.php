@@ -59,7 +59,7 @@ class DestroyCrontabProvisionerTest extends AbstractDestroyProvisionerTest
         $env->addVirtualServer($server);
         $applicationEnvironment->setEnvironment($env);
 
-        $this->invokeProvisionerMethod($provisioner, 'doRemove', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doDestroy', $ssh, $applicationEnvironment);
     }
 
     protected function getProvisionerClass()
