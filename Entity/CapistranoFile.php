@@ -60,7 +60,7 @@ class CapistranoFile
      * @Assert\NotBlank()
      * @CapistranoAssert\ChmodMode()
      */
-    protected $chmod = 644;
+    protected $chmod;
 
     /**
      * @var string

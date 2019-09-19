@@ -82,6 +82,7 @@ abstract class AbstractCapistranoFieldType extends AbstractFieldType
         $options['entry_type'] = $formTypeClass;
         $options['allow_add'] = true;
         $options['allow_delete'] = true;
+        $options['delete_empty'] = true;
         $options['by_reference'] = false;
         $options['prototype'] = true;
         $options['prototype_data'] = new $entityClass();
