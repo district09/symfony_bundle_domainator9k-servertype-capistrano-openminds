@@ -18,7 +18,7 @@ class BuildSymlinkProvisioner extends AbstractBuildProvisioner
         return 'Capistrano symlinks';
     }
 
-    protected function doBuild(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doBuild(SSH2 $ssh, ApplicationEnvironment $appEnv, $isTaskServer)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating symlinks', 1);
 
