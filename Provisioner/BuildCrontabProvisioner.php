@@ -18,7 +18,7 @@ class BuildCrontabProvisioner extends AbstractBuildProvisioner
         return 'Capistrano crontab';
     }
 
-    protected function doBuild(SSH2 $ssh, ApplicationEnvironment $appEnv)
+    protected function doBuild(SSH2 $ssh, ApplicationEnvironment $appEnv, $isTaskServer)
     {
         $this->taskLoggerService->addLogHeader($this->task, 'Creating crontab', 1);
 
@@ -44,7 +44,7 @@ class BuildCrontabProvisioner extends AbstractBuildProvisioner
         $crontabLines = $this->dataValueService->getValue($appEnv, 'capistrano_crontab_line');
 
         try {
-            if (!$crontabLines || $ssh->host !== $appEnv->getWorkerServerIp()) {
+            if (!$crontabLines || !$isTaskServer) {
                 // Remove the crontab lines.
                 $command = '(' . $command . ') | crontab -';
 
