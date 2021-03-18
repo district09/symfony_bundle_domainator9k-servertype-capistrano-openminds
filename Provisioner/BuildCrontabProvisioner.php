@@ -66,7 +66,7 @@ class BuildCrontabProvisioner extends AbstractBuildProvisioner
             $crontab = escapeshellarg($crontab);
 
             // Apply the changes on the server.
-            $command = '(echo ' . $crontab . ' && ' . $command . ') | crontab -';
+            $command = '(' . $command . ' && echo ' . $crontab . ') | crontab -';
 
             $this->executeSshCommand($ssh, $command);
 
