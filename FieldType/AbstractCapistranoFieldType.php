@@ -44,6 +44,7 @@ abstract class AbstractCapistranoFieldType extends AbstractFieldType
         foreach ($value as $entity) {
             if ($entity) {
                 $this->entityManager->persist($entity);
+                $this->entityManager->flush();
                 $ids[] = $entity->getId();
             }
         }
