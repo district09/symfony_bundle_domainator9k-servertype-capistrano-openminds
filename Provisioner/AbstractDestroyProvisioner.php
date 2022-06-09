@@ -5,7 +5,7 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provi
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Exception\LoggedException;
-use phpseclib\Net\SSH2;
+use phpseclib3\Net\SSH2;
 
 /**
  * Class AbstractDestroyProvisioner
