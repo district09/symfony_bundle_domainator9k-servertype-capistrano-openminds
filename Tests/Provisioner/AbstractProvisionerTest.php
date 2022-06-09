@@ -14,7 +14,7 @@ use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Fixtu
 use DigipolisGent\SettingBundle\Service\DataValueService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use phpseclib\Net\SSH2;
+use phpseclib3\Net\SSH2;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractProvisionerTest extends TestCase

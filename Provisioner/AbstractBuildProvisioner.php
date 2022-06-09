@@ -7,7 +7,7 @@ use DigipolisGent\Domainator9k\CoreBundle\Entity\Task;
 use DigipolisGent\Domainator9k\CoreBundle\Entity\VirtualServer;
 use DigipolisGent\Domainator9k\CoreBundle\Exception\LoggedException;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoCrontabLine;
-use phpseclib\Net\SSH2;
+use phpseclib3\Net\SSH2;
 
 /**
  * Class AbstractBuildProvisioner

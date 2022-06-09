@@ -3,7 +3,7 @@
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Provisioner;
 
 use DigipolisGent\Domainator9k\CoreBundle\Entity\ApplicationEnvironment;
-use phpseclib\Net\SSH2;
+use phpseclib3\Net\SSH2;
 
 /**
  * Class BuildSymlinkProvisioner
