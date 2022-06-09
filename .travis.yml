@@ -1,8 +1,7 @@
 language: php
 
 php:
-  - 7.1
-  - 7.2
+  - 8.1
 
 before_install:
   - echo "memory_limit=2G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
