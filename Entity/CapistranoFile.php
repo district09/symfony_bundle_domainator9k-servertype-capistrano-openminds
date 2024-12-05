@@ -11,10 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class CapistranoFile
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
- *
- * @ORM\Entity()
- * @ORM\Table(name="capistrano_file")
  */
+#[ORM\Table(name: 'capistrano_file')]
+#[ORM\Entity]
 class CapistranoFile
 {
 
@@ -22,57 +21,51 @@ class CapistranoFile
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank()
-     * @Assert\Length(min="2", max="255")
      */
+    #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2, max: 255)]
     protected $name;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $filename;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", nullable=true)
-     * @Assert\NotBlank()
      */
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Assert\NotBlank]
     protected $extension;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank()
      */
+    #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank]
     protected $location;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="chmod",type="smallint",options={"unsigned":true, "default":644})
-     * @Assert\NotBlank()
      * @CapistranoAssert\ChmodMode()
      */
+    #[ORM\Column(name: 'chmod', type: 'smallint', options: ['unsigned' => true, 'default' => 644])]
+    #[Assert\NotBlank]
     protected $chmod;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="text", nullable=true)
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     protected $content;
 
     /**
      * @var CapistranoFile
-     *
-     * @ORM\ManyToOne(targetEntity="CapistranoFile")
      */
+    #[ORM\ManyToOne(targetEntity: \CapistranoFile::class)]
     protected $originalCapistranoFile;
 
     /**

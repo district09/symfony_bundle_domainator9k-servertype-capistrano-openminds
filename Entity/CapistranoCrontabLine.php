@@ -8,10 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class CrontabLine
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
- *
- * @ORM\Entity()
- * @ORM\Table(name="capistrano_crontab_line")
  */
+#[ORM\Table(name: 'capistrano_crontab_line')]
+#[ORM\Entity]
 class CapistranoCrontabLine
 {
 
@@ -19,51 +18,44 @@ class CapistranoCrontabLine
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name",type="string")
      */
+    #[ORM\Column(name: 'name', type: 'string')]
     protected $name;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="minute",type="string")
      */
+    #[ORM\Column(name: 'minute', type: 'string')]
     protected $minute;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="hour",type="string")
      */
+    #[ORM\Column(name: 'hour', type: 'string')]
     protected $hour;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="day_of_month",type="string")
      */
+    #[ORM\Column(name: 'day_of_month', type: 'string')]
     protected $dayOfMonth;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="month_of_year",type="string")
      */
+    #[ORM\Column(name: 'month_of_year', type: 'string')]
     protected $monthOfYear;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="day_of_week",type="string")
      */
+    #[ORM\Column(name: 'day_of_week', type: 'string')]
     protected $dayOfWeek;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="command",type="string",length=500)
      */
+    #[ORM\Column(name: 'command', type: 'string', length: 500)]
     protected $command;
 
     /**

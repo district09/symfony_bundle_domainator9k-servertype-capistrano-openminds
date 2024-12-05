@@ -11,10 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class CapistranoFile
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
- *
- * @ORM\Entity()
- * @ORM\Table(name="capistrano_folder")
  */
+#[ORM\Table(name: 'capistrano_folder')]
+#[ORM\Entity]
 class CapistranoFolder
 {
 
@@ -22,28 +21,26 @@ class CapistranoFolder
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name",type="string")
-     * @Assert\NotBlank()
-     * @Assert\Length(min="2", max="255")
      */
+    #[ORM\Column(name: 'name', type: 'string')]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2, max: 255)]
     protected $name;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="filename",type="string")
-     * @Assert\NotBlank()
      */
+    #[ORM\Column(name: 'filename', type: 'string')]
+    #[Assert\NotBlank]
     protected $location;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="chmod",type="smallint",options={"unsigned":true, "default":750})
-     * @Assert\NotBlank()
      * @CapistranoAssert\ChmodMode(user="7")
      */
+    #[ORM\Column(name: 'chmod', type: 'smallint', options: ['unsigned' => true, 'default' => 750])]
+    #[Assert\NotBlank]
     protected $chmod = 750;
 
     /**

@@ -9,10 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class CapistranoFile
  * @package DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity
- *
- * @ORM\Entity()
- * @ORM\Table(name="capistrano_symlink")
  */
+#[ORM\Table(name: 'capistrano_symlink')]
+#[ORM\Entity]
 class CapistranoSymlink
 {
 
@@ -20,23 +19,20 @@ class CapistranoSymlink
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name",type="string")
      */
+    #[ORM\Column(name: 'name', type: 'string')]
     protected $name;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="source_location",type="string")
      */
+    #[ORM\Column(name: 'source_location', type: 'string')]
     protected $sourceLocation;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="destination_location",type="string")
      */
+    #[ORM\Column(name: 'destination_location', type: 'string')]
     protected $destinationLocation;
 
     /**
