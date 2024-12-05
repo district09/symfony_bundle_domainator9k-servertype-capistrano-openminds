@@ -19,7 +19,8 @@
   },
   "autoload": {
     "psr-4": {
-      "DigipolisGent\\Domainator9k\\ServerTypes\\CapistranoOpenmindsBundle\\": ""
+      "DigipolisGent\\Domainator9k\\ServerTypes\\CapistranoOpenmindsBundle\\": "src",
+      "DigipolisGent\\Domainator9k\\ServerTypes\\CapistranoOpenmindsBundle\\Tests\\": "tests"
     }
   }
 }
