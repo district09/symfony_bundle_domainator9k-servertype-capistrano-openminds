@@ -13,7 +13,7 @@ class CapistranoFileFormTypeTest extends AbstractFormTypeTest
     {
         $formBuilder = $this->getFormBuilderMock();
 
-        $childs = [
+        $children = [
             'name',
             'filename',
             'extension',
@@ -23,15 +23,17 @@ class CapistranoFileFormTypeTest extends AbstractFormTypeTest
         ];
 
         $index = 0;
+        $self = $this;
 
-        foreach ($childs as $child) {
-            $formBuilder
-                ->expects($this->at($index))
-                ->method('add')
-                ->with($child);
+        $formBuilder
+              ->expects($this->any())
+              ->method('add')
+              ->willReturnCallback(function($child) use ($children, &$index, $self, $formBuilder) {
+                  $self->assertEquals($children[$index], $child);
+                  $index++;
 
-            $index++;
-        }
+                  return $formBuilder;
+              });
 
         $formType = new CapistranoFileFormType();
         $formType->buildForm($formBuilder, []);
@@ -41,7 +43,7 @@ class CapistranoFileFormTypeTest extends AbstractFormTypeTest
     {
         $resolver = $this->getOptionsResolverMock();
         $resolver
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('setDefaults')
             ->with(['data_class' => CapistranoFile::class]);
 

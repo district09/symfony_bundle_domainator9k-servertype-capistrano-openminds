@@ -3,9 +3,7 @@
 
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Form\Type;
 
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFolder;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFileFormType;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFolderFormType;
 
 class CapistranoFolderFormTypeTest extends AbstractFormTypeTest
@@ -15,21 +13,23 @@ class CapistranoFolderFormTypeTest extends AbstractFormTypeTest
     {
         $formBuilder = $this->getFormBuilderMock();
 
-        $childs = [
+        $children = [
             'name',
             'location',
+            'chmod',
         ];
 
         $index = 0;
+        $self = $this;
 
-        foreach ($childs as $child) {
-            $formBuilder
-                ->expects($this->at($index))
-                ->method('add')
-                ->with($child);
-
-            $index++;
-        }
+        $formBuilder
+              ->expects($this->any())
+              ->method('add')
+              ->willReturnCallback(function($child) use ($children, &$index, $self, $formBuilder) {
+                  $self->assertEquals($children[$index], $child);
+                  $index++;
+                  return $formBuilder;
+              });
 
         $formType = new CapistranoFolderFormType();
         $formType->buildForm($formBuilder, []);
@@ -39,7 +39,7 @@ class CapistranoFolderFormTypeTest extends AbstractFormTypeTest
     {
         $resolver = $this->getOptionsResolverMock();
         $resolver
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('setDefaults')
             ->with(['data_class' => CapistranoFolder::class]);
 

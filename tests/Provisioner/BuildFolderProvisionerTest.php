@@ -25,12 +25,12 @@ class BuildFolderProvisionerTest extends AbstractBuildProvisionerTest
         $folders->add($folder);
 
         $dataValueService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('getValue')
             ->willReturn($folders);
 
         $templateService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('replaceKeys')
             ->willReturn('/path/to/my/location');
 
@@ -43,14 +43,14 @@ class BuildFolderProvisionerTest extends AbstractBuildProvisionerTest
 
         $path = escapeshellarg('/path/to/my/location');
         $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
+        $ssh->expects($this->atLeastOnce())
             ->method('exec')
             ->with($this->equalTo('mkdir -p ' . $path . ' && chmod 750 ' . $path));
 
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment, true);
     }
 
     protected function getProvisionerClass()

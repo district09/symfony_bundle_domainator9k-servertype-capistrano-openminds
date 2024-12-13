@@ -20,6 +20,10 @@ abstract class AbstractFormTypeTest extends TestCase
         return $mock;
     }
 
+    /**
+     *
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     protected function getFormBuilderMock()
     {
         $mock = $this

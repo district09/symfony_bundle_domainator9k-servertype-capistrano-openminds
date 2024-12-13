@@ -25,19 +25,15 @@ class BuildSymlinkProvisionerTest extends AbstractBuildProvisionerTest
         $symlinks->add($symlink);
 
         $dataValueService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('getValue')
             ->willReturn($symlinks);
 
         $templateService
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('replaceKeys')
-            ->willReturn('/path/to/my/source');
+            ->willReturnOnConsecutiveCalls('/path/to/my/source', '/path/to/my/destination');
 
-        $templateService
-            ->expects($this->at(1))
-            ->method('replaceKeys')
-            ->willReturn('/path/to/my/destination');
 
         $provisioner = new BuildSymlinkProvisioner(
             $dataValueService,
@@ -50,13 +46,13 @@ class BuildSymlinkProvisionerTest extends AbstractBuildProvisionerTest
         $source = escapeshellarg('/path/to/my/source');
 
         $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
+        $ssh->expects($this->atLeastOnce())
             ->method('exec')
             ->with($this->equalTo('ln -sfn ' . $destination . ' ' . $source));
 
         $applicationEnvironment = new ApplicationEnvironment();
 
-        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment, true);
     }
 
     protected function getProvisionerClass()

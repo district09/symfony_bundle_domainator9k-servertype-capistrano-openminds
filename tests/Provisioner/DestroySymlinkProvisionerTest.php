@@ -29,7 +29,7 @@ class DestroySymlinkProvisionerTest extends AbstractDestroyProvisionerTest
             ->willReturn($symlinks);
 
         $templateService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('replaceKeys')
             ->willReturn('/path/to/my/source');
 
@@ -42,7 +42,7 @@ class DestroySymlinkProvisionerTest extends AbstractDestroyProvisionerTest
 
         $source = escapeshellarg('/path/to/my/source');
         $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
+        $ssh->expects($this->atLeastOnce())
             ->method('exec')
             ->with($this->equalTo('rm ' . $source));
 

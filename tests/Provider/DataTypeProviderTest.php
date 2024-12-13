@@ -12,18 +12,18 @@ class DataTypeProviderTest extends TestCase
     public function testGetDataTypes()
     {
         $keys = [
-            'key' => 'string',
-            'label' => 'string',
-            'required' => 'boolean',
-            'field_type' => 'string',
-            'entity_types' => 'array',
+            'key' => 'is_string',
+            'label' => 'is_string',
+            'required' => 'is_bool',
+            'field_type' => 'is_string',
+            'entity_types' => 'is_array',
         ];
 
         $dataTypeProvider = new DataTypeProvider();
         foreach ($dataTypeProvider->getDataTypes() as $dataType) {
-            foreach ($keys as $name => $type){
+            foreach ($keys as $name => $func){
                 $this->assertArrayHasKey($name, $dataType);
-                $this->assertInternalType($type,$dataType[$name]);
+                $this->assertTrue($func($dataType[$name]), "$func failed for $name");
             }
         }
     }

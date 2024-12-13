@@ -1,11 +1,8 @@
 <?php
 
-
 namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Tests\Form\Type;
 
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoFile;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Entity\CapistranoSymlink;
-use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoFileFormType;
 use DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Form\Type\CapistranoSymlinkFormType;
 
 class CapistranoSymlinkFormTypeTest extends AbstractFormTypeTest
@@ -15,22 +12,23 @@ class CapistranoSymlinkFormTypeTest extends AbstractFormTypeTest
     {
         $formBuilder = $this->getFormBuilderMock();
 
-        $childs = [
+        $children = [
             'name',
             'sourceLocation',
             'destinationLocation',
         ];
 
         $index = 0;
+        $self = $this;
 
-        foreach ($childs as $child) {
-            $formBuilder
-                ->expects($this->at($index))
-                ->method('add')
-                ->with($child);
-
-            $index++;
-        }
+        $formBuilder
+              ->expects($this->any())
+              ->method('add')
+              ->willReturnCallback(function($child) use ($children, &$index, $self, $formBuilder) {
+                  $self->assertEquals($children[$index], $child);
+                  $index++;
+                  return $formBuilder;
+              });
 
         $formType = new CapistranoSymlinkFormType();
         $formType->buildForm($formBuilder, []);
@@ -40,7 +38,7 @@ class CapistranoSymlinkFormTypeTest extends AbstractFormTypeTest
     {
         $resolver = $this->getOptionsResolverMock();
         $resolver
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('setDefaults')
             ->with(['data_class' => CapistranoSymlink::class]);
 

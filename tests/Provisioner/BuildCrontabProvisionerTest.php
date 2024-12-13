@@ -33,7 +33,7 @@ class BuildCrontabProvisionerTest extends AbstractBuildProvisionerTest
         $lines->add($line);
 
         $dataValueService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('getValue')
             ->willReturn($lines);
 
@@ -61,7 +61,7 @@ class BuildCrontabProvisionerTest extends AbstractBuildProvisionerTest
         $env->addVirtualServer($server);
         $applicationEnvironment->setEnvironment($env);
 
-        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment, true);
     }
 
     protected function getProvisionerClass()

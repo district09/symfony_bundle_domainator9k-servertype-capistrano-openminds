@@ -23,22 +23,16 @@ abstract class AbstractFieldTypeTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $index = 0;
-
-        foreach ($repositories as $class => $repository) {
-            $mock
-                ->expects($this->at($index))
+        if ($repositories) {
+            $mock->expects($this->atLeastOnce())
                 ->method('getRepository')
-                ->with($this->equalTo($class))
-                ->willReturn($repository);
-
-            $index++;
+                ->willReturnCallback(function($class) use ($repositories) { return $repositories[$class]; });
         }
 
         return $mock;
     }
 
-    protected function setEntitytId($entity, $id)
+    protected function setEntityId($entity, $id)
     {
         $reflectionObject = new \ReflectionObject($entity);
         $property = $reflectionObject->getProperty('id');
@@ -66,8 +60,8 @@ abstract class AbstractFieldTypeTest extends TestCase
         $entityManager = $this->getEntityManagerMock();
 
         $entities = [];
-        $entities[] = $this->setEntitytId(new $entityClass, 1);
-        $entities[] = $this->setEntitytId(new $entityClass, 2);
+        $entities[] = $this->setEntityId(new $entityClass, 1);
+        $entities[] = $this->setEntityId(new $entityClass, 2);
 
         $fieldType = new $fieldTypeClass($entityManager);
         $result = $fieldType->encodeValue($entities);
@@ -78,23 +72,12 @@ abstract class AbstractFieldTypeTest extends TestCase
     {
         $repository = $this->getRepositoryMock();
         $repository
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('find')
-            ->with($this->equalTo(1))
-            ->willReturn($this->setEntitytId(new $entityClass, 1));
+            ->willReturnCallback(fn ($id) => $this->setEntityId(new $entityClass, $id));
 
-        $repository
-            ->expects($this->at(1))
-            ->method('find')
-            ->with($this->equalTo(2))
-            ->willReturn($this->setEntitytId(new $entityClass, 2));
 
-        $entityManager = $this->getEntityManagerMock();
-        $entityManager
-            ->expects($this->at(0))
-            ->method('getRepository')
-            ->with($this->equalTo($entityClass))
-            ->willReturn($repository);
+        $entityManager = $this->getEntityManagerMock([$entityClass => $repository]);
 
         $fieldType = new $fieldTypeClass($entityManager);
         $result = $fieldType->decodeValue('[1,2]');
@@ -113,16 +96,9 @@ abstract class AbstractFieldTypeTest extends TestCase
         $sdvRepository = $this->getRepositoryMock(SettingDataValueRepository::class);
 
         $cRepository
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('find')
-            ->with($this->equalTo(1))
-            ->willReturn($this->setEntitytId(new $entityClass, 1));
-
-        $cRepository
-            ->expects($this->at(1))
-            ->method('find')
-            ->with($this->equalTo(2))
-            ->willReturn($this->setEntitytId(new $entityClass, 2));
+            ->willReturnCallback(fn ($id) => $this->setEntityId(new $entityClass, $id));
 
         $repositories = [
             $entityClass => $cRepository,
@@ -173,31 +149,24 @@ abstract class AbstractFieldTypeTest extends TestCase
         $settingDataValue->setValue('[1,2]');
 
         $atRepository
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('findOneBy')
             ->willReturn($applicationType);
 
         $ateRepository
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('findOneBy')
             ->willReturn($applicationTypeEnvironment);
 
         $sdvRepository
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('findOneByKey')
             ->willReturn($settingDataValue);
 
         $cRepository
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('find')
-            ->with($this->equalTo(1))
-            ->willReturn($this->setEntitytId(new $entityClass, 1));
-
-        $cRepository
-            ->expects($this->at(1))
-            ->method('find')
-            ->with($this->equalTo(2))
-            ->willReturn($this->setEntitytId(new $entityClass, 2));
+            ->willReturnCallback(fn ($id) => $this->setEntityId(new $entityClass, $id));
 
         $repositories = [
             $entityClass => $cRepository,

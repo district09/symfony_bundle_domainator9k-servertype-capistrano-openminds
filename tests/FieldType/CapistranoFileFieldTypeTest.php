@@ -15,6 +15,7 @@ class CapistranoFileFieldTypeTest extends AbstractFieldTypeTest
         $this->assertEquals('capistrano_file', CapistranoFileFieldType::getName());
     }
 
+
     public function testGetFormType()
     {
         $entityManager = $this->getEntityManagerMock();

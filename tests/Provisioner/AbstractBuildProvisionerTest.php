@@ -48,12 +48,12 @@ abstract class AbstractBuildProvisionerTest extends AbstractProvisionerTest
         $serverRepository = $this->getRepositoryMock();
 
         $serverRepository
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('findAll')
             ->willReturn($servers);
 
         $entityManager
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('getRepository')
             ->with($this->equalTo(VirtualServer::class))
             ->willReturn($serverRepository);

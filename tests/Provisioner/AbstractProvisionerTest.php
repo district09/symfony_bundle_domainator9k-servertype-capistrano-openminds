@@ -81,14 +81,11 @@ abstract class AbstractProvisionerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $index = 0;
-        foreach ($values as $value) {
-            $mock
-                ->expects($this->at($index))
-                ->method('getValue')
-                ->willReturn($value);
-
-            $index++;
+        if ($values) {
+          $mock
+              ->expects($this->any())
+              ->method('getValue')
+              ->willReturnOnConsecutiveCalls(...$values);
         }
 
         return $mock;

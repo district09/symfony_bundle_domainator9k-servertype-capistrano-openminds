@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class BuildFileProvisionerTest extends AbstractBuildProvisionerTest
 {
-
     public function testDoCreate()
     {
         $dataValueService = $this->getDataValueServiceMock([]);
@@ -27,13 +26,17 @@ class BuildFileProvisionerTest extends AbstractBuildProvisionerTest
         $file->setName('testname.php');
         $files->add($file);
 
+
+        $applicationEnvironment = new ApplicationEnvironment();
+
         $dataValueService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('getValue')
+            ->with($applicationEnvironment, 'capistrano_file')
             ->willReturn($files);
 
         $templateService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('replaceKeys')
             ->willReturn('/path/to/my/location');
 
@@ -51,9 +54,8 @@ class BuildFileProvisionerTest extends AbstractBuildProvisionerTest
             ->with($this->stringContains($path));
 
 
-        $applicationEnvironment = new ApplicationEnvironment();
 
-        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment);
+        $this->invokeProvisionerMethod($provisioner, 'doBuild', $ssh, $applicationEnvironment, true);
     }
 
     protected function getProvisionerClass()

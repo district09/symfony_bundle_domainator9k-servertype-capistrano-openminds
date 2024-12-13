@@ -28,12 +28,12 @@ class DestroyFileProvisionerTest extends AbstractDestroyProvisionerTest
         $files->add($file);
 
         $dataValueService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('getValue')
             ->willReturn($files);
 
         $templateService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('replaceKeys')
             ->willReturn($file->getLocation() . '/' . $file->getFilename() . '.' . $file->getExtension());
 
@@ -46,7 +46,7 @@ class DestroyFileProvisionerTest extends AbstractDestroyProvisionerTest
 
         $path = escapeshellarg($file->getLocation() . '/' . $file->getFilename() . '.' . $file->getExtension());
         $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
+        $ssh->expects($this->atLeastOnce())
             ->method('exec')
             ->with($this->stringContains('rm -f ' . $path));
 

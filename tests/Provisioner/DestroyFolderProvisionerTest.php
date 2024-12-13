@@ -24,12 +24,12 @@ class DestroyFolderProvisionerTest extends AbstractDestroyProvisionerTest
         $folders->add($folder);
 
         $dataValueService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('getValue')
             ->willReturn($folders);
 
         $templateService
-            ->expects($this->at(0))
+            ->expects($this->atLeastOnce())
             ->method('replaceKeys')
             ->willReturn('/path/to/my/location');
 
@@ -42,7 +42,7 @@ class DestroyFolderProvisionerTest extends AbstractDestroyProvisionerTest
 
         $path = escapeshellarg('/path/to/my/location');
         $ssh = $this->getSsh2Mock();
-        $ssh->expects($this->at(0))
+        $ssh->expects($this->atLeastOnce())
             ->method('exec')
             ->with($this->equalTo('rm -rf ' . $path));
 
