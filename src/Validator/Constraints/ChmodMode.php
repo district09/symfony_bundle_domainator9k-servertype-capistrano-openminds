@@ -4,9 +4,7 @@ namespace DigipolisGent\Domainator9k\ServerTypes\CapistranoOpenmindsBundle\Valid
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- */
+#[\Attribute]
 class ChmodMode extends Constraint
 {
     public $special = '0';

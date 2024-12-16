@@ -50,10 +50,10 @@ class CapistranoFile
     /**
      * @var int
      *
-     * @CapistranoAssert\ChmodMode()
      */
     #[ORM\Column(name: 'chmod', type: 'smallint', options: ['unsigned' => true, 'default' => 644])]
     #[Assert\NotBlank]
+    #[CapistranoAssert\ChmodMode]
     protected $chmod;
 
     /**
@@ -65,7 +65,7 @@ class CapistranoFile
     /**
      * @var CapistranoFile
      */
-    #[ORM\ManyToOne(targetEntity: \CapistranoFile::class)]
+    #[ORM\ManyToOne(targetEntity: CapistranoFile::class)]
     protected $originalCapistranoFile;
 
     /**
