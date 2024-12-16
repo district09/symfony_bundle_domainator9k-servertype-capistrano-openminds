@@ -41,6 +41,7 @@ class CapistranoFolder
      */
     #[ORM\Column(name: 'chmod', type: 'smallint', options: ['unsigned' => true, 'default' => 750])]
     #[Assert\NotBlank]
+    #[CapistranoAssert\ChmodMode(user: "7")]
     protected $chmod = 750;
 
     /**
