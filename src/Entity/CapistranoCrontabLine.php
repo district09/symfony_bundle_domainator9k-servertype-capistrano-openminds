@@ -69,7 +69,7 @@ class CapistranoCrontabLine
     /**
      * @param string $name
      */
-    public function setName(string $name = null)
+    public function setName(?string $name = null)
     {
         $this->name = $name;
     }
@@ -85,7 +85,7 @@ class CapistranoCrontabLine
     /**
      * @param string $minute
      */
-    public function setMinute(string $minute = null)
+    public function setMinute(?string $minute = null)
     {
         $this->minute = $minute;
     }
@@ -101,7 +101,7 @@ class CapistranoCrontabLine
     /**
      * @param string $hour
      */
-    public function setHour(string $hour = null)
+    public function setHour(?string $hour = null)
     {
         $this->hour = $hour;
     }
@@ -117,7 +117,7 @@ class CapistranoCrontabLine
     /**
      * @param string $dayOfMonth
      */
-    public function setDayOfMonth(string $dayOfMonth = null)
+    public function setDayOfMonth(?string $dayOfMonth = null)
     {
         $this->dayOfMonth = $dayOfMonth;
     }
@@ -133,7 +133,7 @@ class CapistranoCrontabLine
     /**
      * @param string $monthOfYear
      */
-    public function setMonthOfYear(string $monthOfYear = null)
+    public function setMonthOfYear(?string $monthOfYear = null)
     {
         $this->monthOfYear = $monthOfYear;
     }
@@ -149,7 +149,7 @@ class CapistranoCrontabLine
     /**
      * @param string $dayOfWeek
      */
-    public function setDayOfWeek(string $dayOfWeek = null)
+    public function setDayOfWeek(?string $dayOfWeek = null)
     {
         $this->dayOfWeek = $dayOfWeek;
     }
@@ -165,7 +165,7 @@ class CapistranoCrontabLine
     /**
      * @param string $command
      */
-    public function setCommand(string $command = null)
+    public function setCommand(?string $command = null)
     {
         $this->command = $command;
     }
